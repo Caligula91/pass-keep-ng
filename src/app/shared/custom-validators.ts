@@ -45,7 +45,8 @@ export const validDelete = ((): ValidatorFn => {
 export const validPassword = ((): ValidatorFn => {
   return (formGroup: AbstractControl): ValidationErrors | null => {
     const password = formGroup.value;
-    return (password && password.match(/^[0-9a-zA-Z]+$/)) 
+    if (!password) return null;
+    return (password.match(/^[0-9a-zA-Z]+$/)) 
       ? null
       : { 'invalidCharacters': true };
   }

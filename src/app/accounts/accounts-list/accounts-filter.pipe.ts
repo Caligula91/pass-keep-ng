@@ -30,7 +30,7 @@ export class AccountsFilterPipe implements PipeTransform {
 
     if (search) {
       return value.reduce((acc, curr) => {
-        if (curr.name.startsWith(search))
+        if (curr.name.toLowerCase().startsWith(search.toLocaleLowerCase()))
           acc.push(curr);
         return acc;
       }, new Array<Account>())
