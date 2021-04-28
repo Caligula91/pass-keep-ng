@@ -1,0 +1,83 @@
+<nav class="navbar navbar-expand-lg navbar-light fixed-top" style="background-color: #e3f2fd;">
+    <a class="navbar-brand" [routerLink]="['/']">PassKeep</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- LOGGED IN -->
+        <!-- LEFT -->
+        <ul *ngIf="name" class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a 
+                    class="nav-link" 
+                    [routerLink]="['/', 'accounts']" 
+                    routerLinkActive="active"
+                    data-toggle="collapse" 
+                    data-target=".navbar-collapse.show">
+                    Accounts({{ (accountsObs | async)?.length }})
+                </a>
+            </li>
+            <li class="nav-item">
+                <a 
+                    class="nav-link" 
+                    [routerLink]="['/create-account']" 
+                    routerLinkActive="active"
+                    data-toggle="collapse" 
+                    data-target=".navbar-collapse.show">
+                    New
+                </a>
+            </li>
+        </ul>
+        
+        <!-- RIGHT -->
+        <ul  *ngIf="name" class="navbar-nav mr-right">
+            <li class="nav-item">
+                <a 
+                    class="nav-link"
+                    [routerLink]="['/user']" 
+                    routerLinkActive="active"
+                    data-toggle="collapse" 
+                    data-target=".navbar-collapse.show">
+                    {{ name | firstWord }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a 
+                    class="nav-link" 
+                    (click)="logout()"
+                    data-toggle="collapse" 
+                    data-target=".navbar-collapse.show">
+                    Logout
+                </a>
+            </li>
+        </ul>
+
+        <!-- NOT LOGGED -->
+        <ul *ngIf="!name" class="navbar-nav mr-auto"></ul>
+        <ul  *ngIf="!name" class="navbar-nav mr-right">
+            <li class="nav-item">
+                <a 
+                    class="nav-link" 
+                    [routerLink]="['/auth/login']" 
+                    routerLinkActive="active" 
+                    data-toggle="collapse" 
+                    data-target=".navbar-collapse.show">
+                    LOGIN
+                </a>
+            </li>
+            <li class="nav-item">
+                <a 
+                    class="nav-link" 
+                    [routerLink]="['/auth/signup']" 
+                    routerLinkActive="active"               
+                    data-toggle="collapse" 
+                    data-target=".navbar-collapse.show">
+                    SIGNUP
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+

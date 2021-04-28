@@ -1,0 +1,187 @@
+<div class="row justify-content-center align-items-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <ng-container *ngIf="!serverError; else serverAlert">
+            
+            <!-- SPINNER -->
+            <div class="spinner" *ngIf="isLoading">
+                <app-loading-spinner></app-loading-spinner>
+            </div>
+            <!-- ERROR -->
+            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" style="text-align: center;" role="alert">
+                {{ error }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <br>
+            </div>
+            <!-- SUCCESS -->
+            <div *ngIf="success" class="alert alert-success alert-dismissible fade show" style="text-align: center;" role="alert">
+                {{ success }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+    
+            <!-- USER INFO -->
+            <div class="user-info" *ngIf="user && viewMode">    
+                <h4>
+                    <div class="dropdown">
+                        <div class="btn-group dropleft">
+                            <button type="button" class="menu-button" id="dropdownMenuButton_1" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                <img class="menu-image" src="/assets/menu.png" alt="...">
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton_1">
+                                <a class="dropdown-item clickable" (click)="onEditName()">{{ (editName)?'Exit':'Change Name' }}</a>
+                                <a class="dropdown-item clickable" (click)="turnOnMode('updatePasswordMode')">Change Password</a>
+                                <a class="dropdown-item clickable warning-action" (click)="turnOnMode('deactivateUserMode')">Deactivate</a>
+                                <a class="dropdown-item clickable danger-action" (click)="turnOnMode('deleteUserMode')">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                    <img class="menu-image-mobile clickable" (click)="onOpenMenuMobile()" src="/assets/menu.png" alt="...">
+                    User Info
+                </h4>
+                <table>
+                    <tr>
+                        <td [ngClass]="{ 'name-edit-mode': editName }">Name:</td>
+                        <td *ngIf="!editName; else editNameForm">{{ user.name }}</td>
+                        <ng-template #editNameForm>
+                            <td>
+                                <form [formGroup]="nameForm" (ngSubmit)="onSubmitUpdateName()">
+                                    <div class="form-group">
+                                        <input class="form-control" name="name" formControlName="name" type="text">
+                                        <div class="btn-group-edit">
+                                            <button [disabled]="!nameForm.valid" class="btn btn-success">save</button>
+                                            <button type="button" class="btn btn-primary" (click)="onEditName()">exit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                        </ng-template>
+                    </tr>
+                    <tr>
+                        <td>Email:</td>
+                        <td>{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td>Role:</td>
+                        <td>{{ user.role }}</td>
+                    </tr>
+                    <tr>
+                        <td>Since:</td>
+                        <td>{{ user.userCreated | date:'medium' }}</td>
+                    </tr>
+                </table>
+                <hr>
+                <h4>Accounts Info</h4>
+                <table>
+                    <tr>
+                        <td>Total Accounts:</td>
+                        <td>{{ user.accounts.length }}</td>
+                    </tr>
+                    <tr *ngIf="user.lastCheckedAccount">
+                        <td>LastCheckedAccount:</td>
+                        <td>{{ user.lastCheckedAccount }}</td>
+                    </tr>
+                    <tr *ngIf="user.lastCheckedAccountDate">
+                        <td>LastCheckedAccountDate:</td>
+                        <td>{{ user.lastCheckedAccountDate | date:'medium' }}</td>
+                    </tr>
+                </table>
+                <hr>
+            </div>
+    
+            <!-- UPDATE PASSWORD MODE -->
+            <form class="password-form" *ngIf="updatePasswordMode && !isLoading" (ngSubmit)="onSubmitUpdatePassword()" [formGroup]="passwordForm">
+                <div class="form-group">
+                    <label for="passwordCurrent">Current Password</label>
+                    <div class="input-group">
+                        <input type="password" name="passwordCurrent" formControlName="passwordCurrent" class="form-control" #passwordCurrent>
+                        <div class="input-group-append">
+                            <img class="input-group-text clickable" alt="eye" [appPasswordVisibility]="passwordCurrent">
+                        </div>
+                    </div>
+                    <div style="color: red;" *ngIf="passwordForm.get('password')?.touched">
+                        <small *ngIf="passwordForm.get('passwordCurrent')?.errors?.required">password required</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <input type="password" name="password" formControlName="password" class="form-control" #password>
+                        <div class="input-group-append">
+                            <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="password">
+                        </div>
+                    </div>
+                    <div style="color: red;" *ngIf="passwordForm.get('password')?.touched">
+                        <small *ngIf="passwordForm.get('password')?.errors?.required">password required</small>
+                        <small *ngIf="passwordForm.get('password')?.errors?.minlength">minimum 8 characters</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="passwordConfirm">Password Confirm</label>
+                    <div class="input-group">
+                        <input type="password" name="passwordConfirm" formControlName="passwordConfirm" class="form-control" #passwordConfirm>
+                        <div class="input-group-append">
+                            <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="passwordConfirm">
+                        </div>
+                    </div>
+                    <div style="color: red;" *ngIf="passwordForm.get('passwordConfirm')?.touched">
+                        <small *ngIf="passwordForm.errors?.passwordsNotMatching">passwords not matching</small>
+                    </div>
+                </div>
+                <button class="btn btn-success" [disabled]="!passwordForm.valid">Update Password</button>
+                <button style="float: right;" class="btn btn-primary" type="button" (click)="turnOnMode('viewMode')">Exit</button>
+            </form>
+    
+            <!-- DEACTIVATE MODE -->
+            <form *ngIf="deactivateUserMode && !isLoading" class="deactivate-form">
+                <form [formGroup]="deactivateForm" (ngSubmit)="onSubmitDeactivateUser()">
+                    <div class="form-group">
+                        <label style="text-align: center;" for="deactivate">Type <span style="color: red;">deactivate</span> to deactivate your profile</label>
+                        <input formControlName="deactivate" type="text" class="form-control" name="deactivate">
+                    </div>
+                    <button class="btn btn-danger" [disabled]="!deactivateForm.valid">Deactivate</button>
+                    <button style="float: right;" class="btn btn-primary" type="button" (click)="turnOnMode('viewMode')">Exit</button>
+                </form>
+            </form>
+    
+            <!-- DELETE MODE -->
+            <form *ngIf="deleteUserMode && !isLoading" class="delete-form">
+                <form [formGroup]="deleteForm" (ngSubmit)="onSubmitDeleteUser()">
+                    <div class="form-group">
+                        <label for="password">Your Password</label>
+                        <div class="input-group">
+                            <input type="password" name="password" formControlName="password" class="form-control" #currentPass>
+                            <div class="input-group-append">
+                                <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="currentPass">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="text-align: center;" for="delete">Type <span style="color: red;">delete</span> to
+                            delete your profile</label>
+                        <input formControlName="delete" type="text" class="form-control" name="delete">
+                    </div>
+                    <button class="btn btn-danger" [disabled]="!deleteForm.valid">Delete</button>
+                    <button style="float: right;" class="btn btn-primary" type="button"
+                        (click)="turnOnMode('viewMode')">Exit</button>
+                </form>
+            </form>
+        </ng-container>
+
+        <ng-template #serverAlert>
+            <!-- SERVER ERROR -->
+            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" style="text-align: center;" role="alert">
+                {{ error }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <br>
+                <a class="clickable" (click)="fetchUserInfo()">Reload</a>
+            </div>
+        </ng-template>
+
+    </div>
+</div>

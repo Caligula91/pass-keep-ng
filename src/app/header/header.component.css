@@ -1,0 +1,19 @@
+a {
+  cursor: pointer;
+}
+
+.navbar {
+  padding: 10px calc((100% - 650px) / 2);
+}
+
+@media screen and (max-width: 991px) {
+  .navbar {
+    padding: 10px calc((100% - 550px) / 2);
+  }
+}
+
+@media screen and (max-width: 610px) {
+  .navbar {
+    padding: 10px 10px;
+  }
+}

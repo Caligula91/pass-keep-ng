@@ -1,0 +1,47 @@
+.row {
+  margin-top: 50px;
+}
+
+.account-image {
+  margin: auto;
+  width: 64px;
+  height: 64px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: center;
+  --card-header-height: 0;
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  margin: 20px 15px;
+}
+.card-text {
+  margin: 10px 15px;
+}
+
+.card-buttons {
+  margin: 0 15px;
+  margin-bottom: 5px;
+}
+.card-buttons button {
+  margin-right: 20px;
+}
+
+.add-image {
+  position: relative;
+  height: 100%;
+}
+.add-image img {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: calc(53.5% + 24px);
+  left: -10px;
+  cursor: pointer;
+}

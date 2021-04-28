@@ -1,0 +1,23 @@
+<div class="container" style="margin-top: 50px;">
+    <div *ngIf="isLoading; else successMessage" style="text-align: center;">
+        <app-loading-spinner></app-loading-spinner>
+    </div>
+
+    <ng-template #successMessage>
+        <div class="row justify-content-center align-items-center" style="text-align: center;">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Well done!</h4>
+                    <p>Your email {{ userEmail }} is now verified. Feel free to store your sensitive data like passwords and
+                        pin-codes</p>
+                    <hr>
+                    <p class="mb-0">You can safely close this tab</p>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>
+
+
+
+

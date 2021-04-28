@@ -1,0 +1,35 @@
+<!-- FILTERS -->
+<form [formGroup]="filterForm">
+    <div class="form-row">
+        <div class="col-7 col-sm-8">
+            <div class="form-group">
+                <input formControlName="search" class="form-control" type="search" name="search"
+                    placeholder="Search" aria-label="Search">
+            </div>
+        </div>
+        <div class="col">
+            <select class="form-control" formControlName="options" name="options">
+                <option value="name_ASC">Name&#8593;</option>
+                <option value="name_DESC">Name&#8595;</option>
+                <option value="modified_DESC">Newer</option>
+                <option value="modified_ASC">Older</option>
+            </select>
+        </div>
+        <div class="col-1 accounts-options">
+            <div class="dropdown">
+                <!-- ADDITIONAL OPTIONS -->
+                <div class="btn-group dropleft">
+                    <button type="button" class="options-button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        <img class="clickable options-image" src="/assets/options.png" alt=":">
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item clickable" (click)="onReload()">Reload</a>
+                        <a class="dropdown-item clickable" [routerLink]="['/create-account']" style="color: green;">Add</a>
+                    </div>
+                </div>
+            </div>         
+        </div>
+    </div>
+</form>
+

@@ -1,0 +1,17 @@
+<div class="modal-header text-center">
+    <h4 class="modal-title w-100" id="modal-basic-title">Are you sure?</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body text-center">
+    <div class="row">
+        <div class="col-md-12 flex-wrap flex-row flex-wrap justify-start items-start">
+            <p >Do you really want to delete this account? This process cannot be undone.</p>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-danger" (click)="activeModal.close()">Delete</button>
+    <button class="btn btn-secondary" (click)="activeModal.dismiss()">Exit</button>
+</div>

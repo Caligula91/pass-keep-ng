@@ -1,0 +1,88 @@
+table td {
+  padding: 10px 10px;
+}
+
+table tr td:nth-child(2) {
+  text-align: center;
+}
+
+h4 {
+  text-align: center;
+  margin: 40px 0;
+  margin-top: 60px;
+}
+
+table {
+  margin: 0 auto;
+}
+
+.alert {
+  margin-top: 50px;
+}
+
+.spinner {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.password-form,
+.deactivate-form,
+.delete-form {
+  margin-top: 60px;
+}
+
+/* EDIT USER */
+.dropdown {
+  position: absolute;
+  right: 30px;
+}
+
+.dropdown-menu {
+  -webkit-box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.25);
+}
+
+.menu-button {
+  border: none;
+  background: none;
+}
+
+.menu-image {
+  width: 16px;
+  height: 16px;
+}
+.menu-image-mobile {
+  display: none;
+}
+
+@media screen and (max-width: 700px) {
+  .menu-image-mobile {
+    display: inline;
+    position: absolute;
+    right: 30px;
+    width: 16px;
+    height: 16px;
+  }
+  .dropdown {
+    display: none;
+  }
+}
+
+.warning-action {
+  color: darkorange;
+}
+
+.danger-action {
+  color: red;
+}
+
+.btn-group-edit {
+  margin: 5px 0;
+}
+.btn-group-edit button {
+  margin: 0 7.5px;
+}
+
+table .name-edit-mode {
+  padding-bottom: 65px;
+}

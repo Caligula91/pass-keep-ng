@@ -1,0 +1,33 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Select Icon</h4>
+
+    <!-- FILTER -->
+    <div class="form-outline search-icon">
+        <input 
+            type="search" 
+            id="form1" 
+            class="form-control" 
+            placeholder="Search Icon" 
+            aria-label="Search" 
+            [(ngModel)]="search"/>
+    </div>
+
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12 flex-wrap flex-row flex-wrap justify-start items-start" (click)="onSelectIcon($event)" (dblclick)="onDoubleClick($event)">
+            <img 
+                *ngFor="let icon of (icons | iconsFilterPipe:search)" 
+                [src]="icon" 
+                alt="icon">
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <img *ngIf="selectedIcon" class="selected-icon" [src]="selectedIcon" alt="temp">
+    <button [disabled]="!selectedIcon" type="button" class="btn btn-success" (click)="activeModal.close(selectedIcon)">Save</button>
+</div>
+

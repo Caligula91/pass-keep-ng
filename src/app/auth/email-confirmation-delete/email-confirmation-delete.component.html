@@ -1,0 +1,17 @@
+<div class="container" style="margin-top: 50px;">
+    <div *ngIf="isLoading; else successMessage" style="text-align: center;">
+        <app-loading-spinner></app-loading-spinner>
+    </div>
+
+    <ng-template #successMessage>
+        <div class="row justify-content-center align-items-center" style="text-align: center;">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                <div class="alert alert-primary" role="alert">
+                    Thank You For Your Cooperation
+                </div>
+                <div class="robocop" style="margin-top: 50px;"></div>
+            </div>
+        </div>
+    </ng-template>
+</div>
+

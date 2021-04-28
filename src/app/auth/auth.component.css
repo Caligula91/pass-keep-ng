@@ -1,0 +1,29 @@
+.clickable {
+  cursor: pointer;
+}
+
+.auth {
+  margin-top: 30px;
+}
+
+.warning {
+  color: red;
+}
+
+.alert {
+  text-align: center;
+}
+
+.alert-login-success {
+  margin-top: 75px;
+}
+
+.forgot-password {
+  text-decoration: none;
+  float: right;
+  margin-top: 8px;
+}
+
+.auth-label {
+  text-align: center;
+}

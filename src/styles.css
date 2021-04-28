@@ -1,1 +1,35 @@
 /* You can add global styles to this file, and also import other style files */
+body {
+  padding-top: 50px;
+  overflow-y: scroll;
+  background-color: rgba(var(--b3f, 250, 250, 250), 1);
+}
+
+.clickable {
+  cursor: pointer;
+  text-decoration: none;
+}
+.clickable:link {
+  text-decoration: none;
+}
+
+.clickable:visited {
+  text-decoration: none;
+}
+
+.clickable:hover {
+  text-decoration: none;
+}
+
+.clickable:active {
+  text-decoration: none;
+}
+
+.alert {
+  word-wrap: break-word;
+  text-align: center;
+}
+
+.spinner {
+  text-align: center;
+}

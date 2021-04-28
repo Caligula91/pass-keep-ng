@@ -1,0 +1,27 @@
+<div class="modal-body text-center">
+    <div class="row">
+        <div class="col-md-12">
+            <table>
+                <tr>
+                    <td><img src="/assets/edit.png" alt="edit"></td>
+                    <td style="text-align: left;"><a (click)="activeModal.close('name')" class="clickable">Change Name</a></td>
+                </tr>
+                <tr>
+                    <td><img src="/assets/edit.png" alt="edit"></td>
+                    <td style="text-align: left;"><a (click)="activeModal.close('password')" class="clickable">Change Password</a></td>
+                </tr>
+                <tr>
+                    <td><img src="/assets/remove.png" alt="edit"></td>
+                    <td style="text-align: left;"><a (click)="activeModal.close('deactivate')" class="clickable deactivate">Deactivate</a></td>
+                </tr>
+                <tr>
+                    <td><img src="/assets/remove.png" alt="edit"></td>
+                    <td style="text-align: left;"><a (click)="activeModal.close('delete')" class="clickable remove">Delete</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal-footer justify-content-center">
+    <button class="btn btn-secondary" (click)="activeModal.dismiss()">Exit</button>
+</div>

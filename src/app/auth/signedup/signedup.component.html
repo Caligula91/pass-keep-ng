@@ -1,0 +1,22 @@
+<!-- EMAIL VERIFICATION PHASE-->
+<div class="row justify-content-center align-items-center auth">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="alert alert-primary" role="alert">
+            <h4 class="alert-heading" style="margin-bottom: 25px;">Email Confirmation</h4>
+            <p>You successfully registered to PassKeep but you need to verify your account.</p>
+            <div *ngIf="!isLoading; else spinner">
+                <p>{{ message }}</p>
+                <hr>
+                <button type="button" class="btn btn-primary" (click)="reSendEmail()">
+                    Resend Email
+                </button>
+            </div>
+            <ng-template #spinner>
+                <hr>
+                <div style="text-align: center;">
+                    <app-loading-spinner></app-loading-spinner>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,22 @@
+.deactivate {
+  color: orange;
+}
+
+.remove {
+  color: red;
+}
+
+.modal body {
+  max-width: 70vw;
+}
+
+.modal-footer button {
+  min-width: 90px;
+}
+
+table {
+  margin: 0 auto;
+}
+table td {
+  padding: 10px 20px;
+}

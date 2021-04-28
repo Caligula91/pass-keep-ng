@@ -1,0 +1,62 @@
+<div *ngIf="accounts.length > 0; else noAccounts" class="accounts-container" (click)="onClick($event)">
+    
+    <ng-container *ngIf="(accounts | accountsFilterPipe:sortBy:order:search) as results">
+
+        <div *ngIf="results.length > 0; else noResults">
+
+            <!-- ACCOUNT CARDS -->
+            <div *ngFor="let account of results" >
+                <!-- ERROR -->
+                <div *ngIf="error && account.id===alertAccountId" class="alert alert-danger alert-dismissible fade show"
+                    role="alert" style="margin-top: 40px;">
+                    {{ error }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+        
+                <!-- SUCCESS -->
+                <div *ngIf="success && account.id===alertAccountId" class="alert alert-success alert-dismissible fade show" role="alert"
+                    style="margin-top: 40px;">
+                    {{ success }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            
+                <div *ngIf="updating && account.id===alertAccountId" class="spinner">
+                    <app-loading-spinner></app-loading-spinner>
+                </div>
+
+                <!-- ACCOUNT CARD -->
+                <app-accounts-card
+                    *ngIf="!updating || account.id!==alertAccountId" 
+                    [account]="account" 
+                    class="account-card" 
+                    [id]="account.id">
+                </app-accounts-card> 
+            </div>  
+
+        </div>
+
+        <ng-template #noResults>
+            <h5>No results for: {{ search }}</h5>
+        </ng-template>
+
+    </ng-container>
+
+</div>
+
+<!-- NO CARDS INFO -->
+<ng-template #noAccounts>
+    <div class="accounts-container">
+        <h5 style="text-align: center;">
+            You don't have accounts. 
+            <a class="clickable" style="text-decoration: none;" [routerLink]="['/create-account']">Click here</a> 
+            to add new account to your list.
+        </h5>
+    </div>
+</ng-template>
+
+
+
