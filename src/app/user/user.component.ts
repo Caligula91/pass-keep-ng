@@ -50,9 +50,10 @@ export class UserComponent implements OnInit, OnDestroy {
       this.passwordForm.reset();
       this.deactivateForm.reset();
       this.deleteForm.reset();
+    } else {
+      this.error = '';
+      this.success = '';
     }
-    this.error = '';
-    this.success = '';
   }
   
   private initForms() {
