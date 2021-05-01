@@ -31,7 +31,6 @@ import { CardChoiceComponent } from './shared/modals/card-choice/card-choice.com
 import { CheckmarkComponent } from './shared/components/checkmark/checkmark.component';
 import { SignedupComponent } from './auth/signedup/signedup.component';
 import { ForgotPasswordComponent } from './shared/modals/forgot-password/forgot-password.component';
-// ICONS
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { UserComponent } from './user/user.component';
 import { UserOptionsComponent } from './shared/modals/user-options/user-options.component';

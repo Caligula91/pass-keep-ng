@@ -1,18 +1,67 @@
 <div class="container" style="margin-top: 50px;">
-    <div *ngIf="isLoading; else successMessage" style="text-align: center;">
+
+    <!-- SPINNER -->
+    <div *ngIf="isLoading; else notLoading" style="text-align: center;">
         <app-loading-spinner></app-loading-spinner>
     </div>
 
-    <ng-template #successMessage>
+    <ng-template #notLoading>
         <div class="row justify-content-center align-items-center" style="text-align: center;">
             <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-                <div class="alert alert-success" role="alert">
-                    <h4 class="alert-heading">Well done!</h4>
-                    <p>Your email {{ userEmail }} is now verified. Feel free to store your sensitive data like passwords and
-                        pin-codes</p>
-                    <hr>
-                    <p class="mb-0">You can safely close this tab</p>
+
+                <!-- SUCCESS -->
+                <div 
+                    *ngIf="success"
+                    class="alert alert-success alert-dismissible fade show" role="alert">
+                    <p>{{ success }}</p>
+                    <p>You can safely close this tab</p>
                 </div>
+
+                <!-- ERROR -->
+                <div 
+                    *ngIf="error"
+                    class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- PIN FORM -->
+                <form *ngIf="!success" (ngSubmit)="onSubmit()" [formGroup]="pinForm">
+                    <h4 style="text-align: center;">Setup your pin code</h4>
+                    <div class="form-group">
+                        <label for="pin">Enter PIN</label>
+                        <div class="input-group">
+                            <input type="password" name="pin" class="form-control" formControlName="pin" #pin>
+                            <div class="input-group-append">
+                                <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="pin">
+                            </div>
+                        </div>
+                        <div class="warning" *ngIf="pinForm.get('pin')?.touched">
+                            <small *ngIf="pinForm.get('pin')?.errors?.required">Pin requried</small>
+                            <small *ngIf="(pinForm.get('pin')?.errors?.minlength || pinForm.get('pin')?.errors?.maxlength); else digitValidation">
+                                Size of pin must be 4 digits
+                            </small>
+                            <ng-template #digitValidation>
+                                <small *ngIf="pinForm.get('pin')?.errors?.pattern">Pin can contain only digits</small>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pinConfirm">Confirm PIN</label>
+                        <div class="input-group">
+                            <input type="password" name="pinConfirm" class="form-control" formControlName="pinConfirm" #pinConfirm>
+                            <div class="input-group-append">
+                                <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="pinConfirm">
+                            </div>
+                        </div>
+                        <div class="warning" *ngIf="pinForm.get('pinConfirm')?.touched">
+                            <small *ngIf="pinForm.errors?.pinsNotMatching">Pin not matching</small>
+                        </div>
+                    </div>
+                    <button [disabled]="!pinForm.valid" class="btn btn-success">Confirm</button>
+                </form>
             </div>
         </div>
     </ng-template>

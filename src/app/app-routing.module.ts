@@ -13,6 +13,7 @@ import { CreateAccountComponent } from './create-account/create-account.componen
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { HomeComponent } from './home/home.component';
 import { UserComponent } from './user/user.component';
+import { EmailConfirmationGuard } from './auth/email-confirmation/email-confirmation.guard';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -23,7 +24,7 @@ const routes: Routes = [
   { path: 'auth', redirectTo: 'auth/login' },
   { path: 'auth/:mode', canActivate: [AuthRouteGuard], component: AuthComponent },
   { path: 'auth/signup/verification', canActivate: [SignedupGuard], component: SignedupComponent },
-  { path: 'email-confirmation/:emailToken', component: EmailConfirmationComponent },
+  { path: 'email-confirmation/:emailToken', canActivate: [EmailConfirmationGuard], component: EmailConfirmationComponent },
   { path: 'email-confirmation/:emailToken/delete', component:  EmailConfirmationDeleteComponent},
   { path: 'reset-password/:passwordToken', component: PasswordResetComponent },
 

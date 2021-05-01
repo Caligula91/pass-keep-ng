@@ -10,6 +10,16 @@ export const passwordsMatch = ((): ValidatorFn => {
   }
 })();
 
+export const pinsMatch = ((): ValidatorFn => {
+  return (formGroup: AbstractControl): ValidationErrors | null => {
+    const pin = formGroup.get('pin')?.value;
+    const pinConfirm = formGroup.get('pinConfirm')?.value;
+    return (pin === pinConfirm) 
+      ? null
+      : { 'pinsNotMatching': true };
+  }
+})();
+
 export const validCharacters = ((): ValidatorFn => {
   const serbianLatinRegExp = new RegExp(/(č|š|dž|ž|đ|ć|[a-z])|\s/, 'ig');
   const error = { 'invalidCharacters': true };

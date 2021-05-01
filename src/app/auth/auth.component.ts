@@ -90,7 +90,6 @@ export class AuthComponent implements OnInit, OnDestroy {
         this.router.navigate(['/accounts']);
       }, 500);
     } else if (action === 'SIGNUP') {
-      this.authService.addStorageListener();
       this.authService.signedup$.next({ 
         email: this.signupForm.get('email')?.value,
         message: alert.message || 'Signeup successfully' });

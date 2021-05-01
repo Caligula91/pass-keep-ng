@@ -62,6 +62,11 @@ export interface EmailConfirmation {
     user: User,
 }
 
+export interface CheckEmailToken {
+    status: string,
+    message: string,
+}
+
 export interface ResetPassword {
     status: string,
     message: string,

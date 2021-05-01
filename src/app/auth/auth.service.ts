@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, take, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { catchError, map, take, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { DatabaseService } from '../shared/services/database.service';
 import * as ServerResponse from '../shared/models/server-response.model';
 import * as ServerAlert from '../shared/models/server-alert.model';
 import { User } from './user.model';
+import getErrorMessage from '../shared/error-message';
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +40,7 @@ export class AuthService {
       this.handleAuthentication(user);
       this.databaseService.emmitSuccess(action, 'Logged in successfully');
     }, error => {
-      this.databaseService.emmitError(action, error.error?.message || error.message);
+      this.databaseService.emmitError(action, getErrorMessage(error));
     })
   }
 
@@ -52,8 +53,9 @@ export class AuthService {
     const url = `${environment.API_HOST}users/signup`;
     this.http.post<ServerResponse.Signup>(url, authData).subscribe(res => {
       this.databaseService.emmitSuccess(action, res.message);
+      this.addStorageListener();
     }, error => {
-      this.databaseService.emmitError(action, error.error?.message || error.message);
+      this.databaseService.emmitError(action, getErrorMessage(error));
     })
   }
 
@@ -67,7 +69,7 @@ export class AuthService {
     this.http.post<ServerResponse.ReSendEmail>(url, { email }).subscribe(res => {
       this.databaseService.emmitSuccess(action, res.message);
     }, error => {
-      this.databaseService.emmitError(action, error.error?.message || error.message);
+      this.databaseService.emmitError(action, getErrorMessage(error));
     })
   }
 
@@ -154,9 +156,12 @@ export class AuthService {
   /**
    * EMAIL CONFIRMATION
    */
-  confirmEmail(emailToken: string): Observable<string> {
+  confirmEmail(emailToken: string, pinData: { pin: string, pinConfirm: string }): Observable<string> {
     const url = `${environment.API_HOST}users/email-confirmation/${emailToken}`;
-    return this.http.get<ServerResponse.EmailConfirmation>(url).pipe(
+    const action = ServerAlert.ActionTypes.ConfirmEmail;
+    this.databaseService.emmitLoading(action);
+    return this.http.post<ServerResponse.EmailConfirmation>(url, pinData).pipe(
+      tap(res => this.databaseService.emmitSuccess(action, 'You have verified your email')),
       map(res => {
         const { 
           token, 
@@ -166,12 +171,24 @@ export class AuthService {
       }),
       tap(user => this.handleAuthentication(user)),
       map(user => user.email),
+      catchError(error => {
+         this.databaseService.emmitError(action, getErrorMessage(error));
+         return throwError(error)
+      })
     );
   }
 
   deletePendingAccount(emailToken: string) : Observable<null> {
     const url = `${environment.API_HOST}users/email-confirmation/${emailToken}`;
     return this.http.delete<null>(url);
+  }
+
+  checkEmailToken(emailToken: string): Observable<boolean> {
+    const url = `${environment.API_HOST}users/email-confirmation/${emailToken}`;
+    return this.http.get<ServerResponse.CheckEmailToken>(url).pipe(
+      map(() => true),
+      catchError(error => of(false))
+    );
   }
 
   /**
@@ -184,7 +201,7 @@ export class AuthService {
     this.http.patch<ServerResponse.ResetPassword>(url, passwordData).subscribe(res => {
       this.databaseService.emmitSuccess(action, res.message);
     }, error => {
-      this.databaseService.emmitError(action, error.error?.message || error.message);
+      this.databaseService.emmitError(action, getErrorMessage(error));
     })
   }
 
@@ -198,7 +215,7 @@ export class AuthService {
     this.http.post<ServerResponse.RequestPasswordResetEmail>(url, { email }).subscribe(res => {
       this.databaseService.emmitSuccess(action, res.message);
     }, error => {
-      this.databaseService.emmitError(action, error.error?.message || error.message);
+      this.databaseService.emmitError(action, getErrorMessage(error));
     });
   }
 

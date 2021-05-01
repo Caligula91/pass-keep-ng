@@ -18,7 +18,7 @@ export class EmailConfirmationDeleteComponent implements OnInit {
     this.authService.deletePendingAccount(emailToken).subscribe(() => {
       this.isLoading = false;
     }, error => {
-      this.router.navigate(['/']);
+      this.router.navigate(['/not-found']);
     })
   }
 
