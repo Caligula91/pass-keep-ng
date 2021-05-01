@@ -86,3 +86,7 @@ table {
 table .name-edit-mode {
   padding-bottom: 65px;
 }
+
+.warning {
+  color: red;
+}

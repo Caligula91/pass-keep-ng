@@ -34,6 +34,7 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton_1">
                                 <a class="dropdown-item clickable" (click)="onEditName()">{{ (editName)?'Exit':'Change Name' }}</a>
                                 <a class="dropdown-item clickable" (click)="turnOnMode('updatePasswordMode')">Change Password</a>
+                                <a class="dropdown-item clickable" (click)="turnOnMode('resetPinMode')">Reset PIN</a>
                                 <a class="dropdown-item clickable warning-action" (click)="turnOnMode('deactivateUserMode')">Deactivate</a>
                                 <a class="dropdown-item clickable danger-action" (click)="turnOnMode('deleteUserMode')">Delete</a>
                             </div>
@@ -94,6 +95,7 @@
     
             <!-- UPDATE PASSWORD MODE -->
             <form class="password-form" *ngIf="updatePasswordMode && !isLoading" (ngSubmit)="onSubmitUpdatePassword()" [formGroup]="passwordForm">
+                <h4 style="text-align: center;">Update Password</h4>
                 <div class="form-group">
                     <label for="passwordCurrent">Current Password</label>
                     <div class="input-group">
@@ -137,6 +139,7 @@
     
             <!-- DEACTIVATE MODE -->
             <form *ngIf="deactivateUserMode && !isLoading" class="deactivate-form">
+                <h4 style="text-align: center;">Deactivate User</h4>
                 <form [formGroup]="deactivateForm" (ngSubmit)="onSubmitDeactivateUser()">
                     <div class="form-group">
                         <label style="text-align: center;" for="deactivate">Type <span style="color: red;">deactivate</span> to deactivate your profile</label>
@@ -149,6 +152,7 @@
     
             <!-- DELETE MODE -->
             <form *ngIf="deleteUserMode && !isLoading" class="delete-form">
+                <h4 style="text-align: center; color: red;">Delete User</h4>
                 <form [formGroup]="deleteForm" (ngSubmit)="onSubmitDeleteUser()">
                     <div class="form-group">
                         <label for="password">Your Password</label>
@@ -168,6 +172,56 @@
                     <button style="float: right;" class="btn btn-primary" type="button"
                         (click)="turnOnMode('viewMode')">Exit</button>
                 </form>
+            </form>
+
+            <!-- RESET PIN MODE -->
+            <form *ngIf="resetPinMode && !isLoading" [formGroup]="pinForm" (ngSubmit)="onSubmitResetPin()">
+                <h4 style="text-align: center;">Reset PIN</h4>
+                <div class="form-group">
+                    <label for="password">Your Password</label>
+                    <div class="input-group">
+                        <input type="password" name="password" formControlName="password" class="form-control" #yourPass>
+                        <div class="input-group-append">
+                            <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="yourPass">
+                        </div>
+                    </div>
+                    <small class="warning"
+                        *ngIf="pinForm.get('password')?.touched && pinForm.get('password')?.errors?.required">Password
+                        requried</small>
+                </div>
+                <div class="form-group">
+                    <label for="pin">PIN</label>
+                    <div class="input-group">
+                        <input type="password" name="pin" formControlName="pin" class="form-control" #pin>
+                        <div class="input-group-append">
+                            <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="pin">
+                        </div>
+                    </div>
+                    <div class="warning" *ngIf="pinForm.get('pin')?.touched">
+                        <small *ngIf="pinForm.get('pin')?.errors?.required">Pin requried</small>
+                        <small
+                            *ngIf="(pinForm.get('pin')?.errors?.minlength || pinForm.get('pin')?.errors?.maxlength); else digitValidation">
+                            Size of pin must be 4 digits
+                        </small>
+                        <ng-template #digitValidation>
+                            <small *ngIf="pinForm.get('pin')?.errors?.pattern">Pin can contain only digits</small>
+                        </ng-template>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pinConfirm">PIN Confirm</label>
+                    <div class="input-group">
+                        <input type="password" name="pinConfirm" formControlName="pinConfirm" class="form-control" #pinConfirm>
+                        <div class="input-group-append">
+                            <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="pinConfirm">
+                        </div>
+                    </div>
+                    <div class="warning" *ngIf="pinForm.get('pinConfirm')?.touched">
+                        <small *ngIf="pinForm.errors?.pinsNotMatching">Pins not matching</small>
+                    </div>
+                </div>
+                <button class="btn btn-success" [disabled]="!pinForm.valid">Reset PIN</button>
+                <button style="float: right;" class="btn btn-primary" type="button" (click)="turnOnMode('viewMode')">Exit</button>
             </form>
         </ng-container>
 

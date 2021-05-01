@@ -31,6 +31,8 @@ export class AccountsListComponent implements OnInit, OnDestroy {
   /** UPDATING */
   updating: boolean = false;
 
+  resetPin: boolean = false;
+
   constructor(private accountsService: AccountsService, private databaseService: DatabaseService, private modalService: NgbModal) { }
 
   ngOnDestroy(): void {
@@ -52,14 +54,19 @@ export class AccountsListComponent implements OnInit, OnDestroy {
     });
 
     this.alertSub = this.databaseService.serverAlert$.pipe(
+      tap(() => this.resetPin = false),
       tap(alert => {
         if (alert.action === 'GET_ACCOUNT_PASSWORD') {
           if (alert.status === 'ERROR') {
             this.success = '';
             this.error = alert.message || 'Failed to get password';
+            this.resetPin = alert.payload === 401;
             this.alertAccountId = this.accountId
           } else if (alert.status === 'SUCCESS') {
             this.error = '';
+          } else if (alert.status === 'LOADING') {
+            this.error = '';
+            this.success = '';
           }
         }
       }),

@@ -109,3 +109,8 @@ export interface DeleteUser {
     status: string,
     message: string,
 }
+
+export interface ResetPin {
+    status: string,
+    message: string,
+}

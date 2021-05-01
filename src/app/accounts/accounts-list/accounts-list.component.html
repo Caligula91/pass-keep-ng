@@ -10,6 +10,7 @@
                 <div *ngIf="error && account.id===alertAccountId" class="alert alert-danger alert-dismissible fade show"
                     role="alert" style="margin-top: 40px;">
                     {{ error }}
+                    <p *ngIf="resetPin">Go to your profile info, click on settings (three dots) and choose 'Reset PIN'</p>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

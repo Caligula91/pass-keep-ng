@@ -20,7 +20,8 @@ export enum ActionTypes {
     UpdateName = 'UPDATE_NAME',
     DeactivateUser = 'DEACTIVATE_USER',
     DeleteUser = 'DELETE_USER',
-    ConfirmEmail = 'CONFIRM_EMAIL'
+    ConfirmEmail = 'CONFIRM_EMAIL',
+    ResetPin = 'RESET_PIN'
 }
 
 export interface ServerAlert {

@@ -30,12 +30,14 @@ export class UserComponent implements OnInit, OnDestroy {
   passwordForm!: FormGroup;
   deactivateForm!: FormGroup;
   deleteForm!: FormGroup;
+  pinForm!: FormGroup;
   /**
    * MODES
    */
   updatePasswordMode: boolean = false;
   deactivateUserMode: boolean = false;
   deleteUserMode: boolean = false;
+  resetPinMode: boolean = false;
   viewMode: boolean = true;
 
   constructor(private userService: UserService, private databaseService: DatabaseService, private modalService: NgbModal) { }
@@ -45,11 +47,13 @@ export class UserComponent implements OnInit, OnDestroy {
     this.updatePasswordMode = mode === 'updatePasswordMode';
     this.deactivateUserMode = mode === 'deactivateUserMode';
     this.deleteUserMode = mode === 'deleteUserMode';
+    this.resetPinMode = mode === 'resetPinMode';
     this.viewMode = mode === 'viewMode';
     if (this.viewMode) {
       this.passwordForm.reset();
       this.deactivateForm.reset();
       this.deleteForm.reset();
+      this.pinForm.reset();
     } else {
       this.error = '';
       this.success = '';
@@ -83,6 +87,13 @@ export class UserComponent implements OnInit, OnDestroy {
       password: new FormControl(null, [Validators.required]),
       delete: new FormControl(null)
     }, { validators: CustomValidators.validDelete });
+
+    // PIN FORM
+    this.pinForm = new FormGroup({
+      password: new FormControl(null, Validators.required),
+      pin: new FormControl(null, [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern(/^[0-9]*$/)]),
+      pinConfirm: new FormControl(null, [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern(/^[0-9]*$/)])
+    }, { validators: CustomValidators.pinsMatch });
   }
 
   ngOnDestroy(): void {
@@ -99,7 +110,8 @@ export class UserComponent implements OnInit, OnDestroy {
         alert.action === 'UPDATE_NAME' || 
         alert.action === 'UPDATE_PASSWORD' ||
         alert.action === 'DEACTIVATE_USER' ||
-        alert.action === 'DELETE_USER'),
+        alert.action === 'DELETE_USER' ||
+        alert.action === 'RESET_PIN'),
       tap(alert => this.isLoading = alert.status === 'LOADING'),
       tap(() => {
         this.error = '';
@@ -117,9 +129,10 @@ export class UserComponent implements OnInit, OnDestroy {
         this.success =  alert.action !== 'GET_ME' 
           ? alert.message || 'success'
           : '';
-        if (alert.action === 'UPDATE_PASSWORD') {
+        if (alert.action === 'UPDATE_PASSWORD' || alert.action === 'RESET_PIN') {
           this.turnOnMode('viewMode');
           this.passwordForm.reset();
+          this.pinForm.reset();
         }
       }
     });
@@ -147,6 +160,10 @@ export class UserComponent implements OnInit, OnDestroy {
         }
         case 'delete': {
           this.turnOnMode('deleteUserMode');
+          break;
+        }
+        case 'pin': {
+          this.turnOnMode('resetPinMode');
           break;
         }
         default: {
@@ -188,6 +205,10 @@ export class UserComponent implements OnInit, OnDestroy {
 
   onSubmitDeleteUser(): void {
     this.userService.deleteUser(this.deleteForm.get('password')?.value);
+  }
+
+  onSubmitResetPin(): void {
+    this.userService.resetPin(this.pinForm.value);
   }
 
 }

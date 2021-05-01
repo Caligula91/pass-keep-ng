@@ -108,4 +108,17 @@ export class UserService {
       tap(() => this.authService.logout())
     ).subscribe()
   }
+
+  resetPin(pinData: { password: string, pin: string, pinConfirm: string }): void {
+    const url = `${environment.API_HOST}users/me/reset-pin`;
+    const action = ServerAlert.ActionTypes.ResetPin;
+    this.databaseService.emmitLoading(action);
+    this.http.patch<ServerResponse.ResetPin>(url, pinData).pipe(
+      catchError(error => {
+        this.databaseService.emmitError(action, getErrorMessage(error), error.status);
+        return throwError(error);
+      }),
+      tap(res => this.databaseService.emmitSuccess(action, res.message))
+    ).subscribe()
+  }
 }

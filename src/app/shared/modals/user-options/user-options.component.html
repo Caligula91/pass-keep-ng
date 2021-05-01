@@ -7,8 +7,22 @@
                     <td style="text-align: left;"><a (click)="activeModal.close('name')" class="clickable">Change Name</a></td>
                 </tr>
                 <tr>
-                    <td><img src="/assets/edit.png" alt="edit"></td>
+                    <td>
+                        <svg-icon 
+                            src="assets/key.svg" 
+                            [svgStyle]="{ 'height.px':22, 'width.px':22}">
+                        </svg-icon>
+                    </td>
                     <td style="text-align: left;"><a (click)="activeModal.close('password')" class="clickable">Change Password</a></td>
+                </tr>
+                <tr>
+                    <td>
+                        <svg-icon 
+                            src="assets/key.svg" 
+                            [svgStyle]="{ 'height.px':22, 'width.px':22}">
+                        </svg-icon>
+                    </td>
+                    <td style="text-align: left;"><a (click)="activeModal.close('pin')" class="clickable">Reset PIN</a></td>
                 </tr>
                 <tr>
                     <td><img src="/assets/remove.png" alt="edit"></td>
