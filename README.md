@@ -1,27 +1,31 @@
 # PassKeep
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.1.2.
+Angular app for storing sensitive data like passwords, pin-codes from different sources.
 
-## Development server
+Angular version 11.1.2.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## About PassKeep
 
-## Code scaffolding
+If you are tired of forgetting passwords and pin-codes, then this app is for you.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Signup, create personal pin-code and start using app. Add account from different platforms to your list.
 
-## Build
+Everytime you want to see password, you need to enter personal pin-code. Pin-code is blocked if you type wrong 4 times.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Security
 
-## Running unit tests
+Passwords are encrypted using Advanced Encryption Standard. You will receive password only when you provide valid pin-code.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Pin-code should be kept only in your head. Pin-code can be reset anytime using user's password.
 
-## Running end-to-end tests
+## Future Plans
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+1. Implement NgRx (I curse myself why I didn't do it at the begining of development)
+2. Email verification on every signin from different IP
+3. Implement refresh token
+4. Rate limit for specific routes (better security)
+5. Improve CSS style
 
-## Further help
+## API Documentation
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+https://documenter.getpostman.com/view/12799337/TzK17aYU
