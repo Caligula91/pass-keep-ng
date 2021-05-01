@@ -1,0 +1,23 @@
+<div class="modal-body text-center">
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <div style="margin-top: 30px;" class="row">
+        <div class="col-md-12 flex-wrap flex-row flex-wrap justify-start items-start">
+            <form #pinForm="ngForm" (ngSubmit)="onSubmit(pinForm)">
+                <div class="form-group">
+                    <label style="text-align: center; margin-bottom: 15px;" for="pin">Enter PIN</label>
+                    <input 
+                        #pinInput
+                        name="pin" 
+                        type="password" 
+                        class="form-control"
+                        ngModel
+                        required
+                        pattern="(^\d{4}$)">
+                </div>
+            </form>
+            <button class="btn btn-success" [disabled]="!pinForm.valid" (click)="activeModal.close(pinForm.value)">Confirm</button>
+        </div>
+    </div>
+</div>

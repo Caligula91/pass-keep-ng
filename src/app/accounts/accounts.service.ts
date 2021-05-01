@@ -97,10 +97,11 @@ export class AccountsService {
   /**
    * ACCOUNT ACTIONS
    */
-  getAccountPassword(accountId: string): void {
+  getAccountPassword(accountId: string, pin: string): void {
     const action = ServerAlert.ActionTypes.GetAccountPassword;
     const url = `${environment.API_HOST}users/account/${accountId}`;
-    this.http.get<ServerResponse.GetAccountPassword>(url).pipe(
+    this.databaseService.emmitLoading(action, 'LOADING', accountId);
+    this.http.post<ServerResponse.GetAccountPassword>(url, { pin }).pipe(
       map(res => res.account.password),
     ).subscribe(password => {
       this.accountAction$.next({ type: ClickTargets.ShowPassword, accountId, payload: password });

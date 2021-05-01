@@ -34,6 +34,8 @@ import { ForgotPasswordComponent } from './shared/modals/forgot-password/forgot-
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { UserComponent } from './user/user.component';
 import { UserOptionsComponent } from './shared/modals/user-options/user-options.component';
+import { PinEnterComponent } from './shared/modals/pin-enter/pin-enter.component';
+import { LoadingDotsComponent } from './shared/components/loading-dots/loading-dots.component';
 
 @NgModule({
   declarations: [
@@ -62,7 +64,9 @@ import { UserOptionsComponent } from './shared/modals/user-options/user-options.
     SignedupComponent,
     ForgotPasswordComponent,
     UserComponent,
-    UserOptionsComponent
+    UserOptionsComponent,
+    PinEnterComponent,
+    LoadingDotsComponent,
   ],
   imports: [
     BrowserModule,

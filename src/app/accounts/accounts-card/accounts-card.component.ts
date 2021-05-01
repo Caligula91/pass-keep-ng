@@ -3,8 +3,10 @@ import { FormControl, FormGroup } from '@angular/forms';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { filter, tap } from 'rxjs/operators';
 import { CardChoiceComponent } from 'src/app/shared/modals/card-choice/card-choice.component';
 import { Account } from 'src/app/shared/models/account.model';
+import { DatabaseService } from 'src/app/shared/services/database.service';
 import { IconsSelectorComponent } from '../../shared/modals/icons-selector/icons-selector.component';
 import { AccountsService } from '../accounts.service';
 
@@ -22,10 +24,13 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
   fieldTextType: boolean = false;
   editForm!: FormGroup;
   previewEditImage!: string;
-  password!: string;
+  password: string = '';
   private sub!: Subscription;
+  private alertSub!: Subscription;
+  isLoading: boolean = false;
   private intervalId: any;
   secondsLeft: number = 5;
+  activeCard: string = '';
 
   public get ClickTargets() {
     return ClickTargets; 
@@ -33,10 +38,12 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
 
   constructor(
     private modalService: NgbModal, 
-    private accountsService: AccountsService) { }
+    private accountsService: AccountsService,
+    private databaseService: DatabaseService) { }
 
   ngOnDestroy(): void {
     this.sub.unsubscribe();
+    this.alertSub.unsubscribe();
     clearInterval(this.intervalId); 
   }
   
@@ -92,6 +99,17 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
       } else if (data.type === ClickTargets.StartEdit || data.type === ClickTargets.DeleteAccount) {
         this.editMode = false;
         this.fieldTextType = false;
+      }
+    })
+
+    this.alertSub = this.databaseService.serverAlert$.pipe(
+      filter(alert => alert.action === 'GET_ACCOUNT_PASSWORD'),
+    ).subscribe(alert => {
+      if (alert.status === 'LOADING') {
+        this.isLoading = true;
+        this.activeCard = String(alert.payload) || '';
+      } else {
+        this.isLoading = false;
       }
     })
   }

@@ -23,15 +23,20 @@
                     </svg-icon>
                 </td>
                 <td>
+                    <div class="spinner" *ngIf="isLoading && activeCard === account.id">
+                        <app-loading-dots></app-loading-dots>
+                    </div>
                     <a 
                         [ngClass]="ClickTargets.ShowPassword" 
                         class="clickable reveal-password" 
-                        *ngIf="!password; else revealPassword">
+                        *ngIf="(!password && !isLoading) || activeCard !== account.id">
                         SHOW PASSWORD
                     </a>
-                    <ng-template #revealPassword>
-                        <span style="color: red; text-align: right;">{{ password }} </span><span class="timer">{{ secondsLeft }}</span>
-                    </ng-template>
+                    <ng-container *ngIf="password && !isLoading && activeCard === account.id">
+                        <span style="color: red; text-align: right;">{{ password }} </span>
+                        <span class="timer">{{ secondsLeft }}</span>
+                    </ng-container>
+                    
                 </td>
             </tr>
         </table>

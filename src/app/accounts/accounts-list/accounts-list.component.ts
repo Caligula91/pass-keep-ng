@@ -5,6 +5,8 @@ import { AccountsService } from '../accounts.service';
 import { ClickTargets } from '../accounts-card/click-targets.model';
 import { DatabaseService } from 'src/app/shared/services/database.service';
 import { filter, tap } from 'rxjs/operators';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PinEnterComponent } from 'src/app/shared/modals/pin-enter/pin-enter.component';
 
 @Component({
   selector: 'app-accounts-list',
@@ -29,7 +31,7 @@ export class AccountsListComponent implements OnInit, OnDestroy {
   /** UPDATING */
   updating: boolean = false;
 
-  constructor(private accountsService: AccountsService, private databaseService: DatabaseService) { }
+  constructor(private accountsService: AccountsService, private databaseService: DatabaseService, private modalService: NgbModal) { }
 
   ngOnDestroy(): void {
     this.accountsSub.unsubscribe();
@@ -50,6 +52,17 @@ export class AccountsListComponent implements OnInit, OnDestroy {
     });
 
     this.alertSub = this.databaseService.serverAlert$.pipe(
+      tap(alert => {
+        if (alert.action === 'GET_ACCOUNT_PASSWORD') {
+          if (alert.status === 'ERROR') {
+            this.success = '';
+            this.error = alert.message || 'Failed to get password';
+            this.alertAccountId = this.accountId
+          } else if (alert.status === 'SUCCESS') {
+            this.error = '';
+          }
+        }
+      }),
       filter(alert => alert.action === 'UPDATE_ACCOUNT'),
       tap(alert => this.updating = alert.status === 'LOADING'),
       tap(() => {
@@ -90,7 +103,10 @@ export class AccountsListComponent implements OnInit, OnDestroy {
           break;
         }
         case ClickTargets.ShowPassword: {
-          this.accountsService.getAccountPassword(this.accountId);
+          this.modalService.open(PinEnterComponent, {ariaLabelledBy: 'modal-basic-title', size: 'sm'}).result.then((result) => {
+            this.accountsService.getAccountPassword(this.accountId, result.pin);
+          }, (reason) => {
+          });
           break;
         }
         case ClickTargets.AddImage: {
