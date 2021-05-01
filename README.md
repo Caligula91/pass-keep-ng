@@ -2,6 +2,8 @@
 
 Angular app for storing sensitive data like passwords, pin-codes from different sources.
 
+https://pass-keep-256a6.firebaseapp.com/
+
 Angular version 11.1.2.
 
 ## About PassKeep
