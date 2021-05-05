@@ -1,14 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { DatabaseService } from '../shared/services/database.service';
-import { AuthService } from './auth.service';
-import * as ServerAlert from '../shared/models/server-alert.model';
-import * as CustomValidators from '../shared/custom-validators';
-import { filter, finalize, take, tap } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import * as CustomValidators from '../shared/custom-validators';
 import { ForgotPasswordComponent } from '../shared/modals/forgot-password/forgot-password.component';
+import * as fromApp from '../store/app.reducer';
+import { getAuthState } from './store/auth.selector';
+import * as AuthActions from './store/auth.actions';
+import { Alert } from '../shared/models/alert.model';
+
 
 @Component({
   selector: 'app-auth',
@@ -21,82 +23,48 @@ export class AuthComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   signupForm!: FormGroup;
   isLoading: boolean = false;
-  error: string = '';
-  emailSent: string = '';
   loggedIn: boolean = false;
-  alertSub!: Subscription;
-  deactivateDeleteMessage: string = '';
+  alert: Alert | null = null;
+  storeSub!: Subscription;
 
   constructor(
     private router: Router, 
     private route: ActivatedRoute, 
-    private authService: AuthService, 
-    private databaseService: DatabaseService,
-    private modalService: NgbModal) { }
+    private modalService: NgbModal,
+    private store: Store<fromApp.AppState>) { }
 
   ngOnDestroy(): void {
-    this.alertSub.unsubscribe();
+    this.storeSub.unsubscribe();
+    this.store.dispatch(AuthActions.clearAlert());
   }
 
   ngOnInit(): void {
+
+    // init login and signup forms
     this.initForms();
     
     this.route.params.subscribe(params => {
       this.isLoginMode = params['mode'] === 'login';
-      this.error = '';
+      this.store.dispatch(AuthActions.clearAlert());
       if (this.isLoginMode) this.signupForm.reset();
       else this.loginForm.reset();
     });
 
-    this.alertSub = this.databaseService.serverAlert$.pipe(
-      filter(alert => {
-        return alert.action === 'LOGIN' || alert.action === 'SIGNUP' || alert.action === 'RESEND_EMAIL';
-      }),
-      tap(alert => {
-        this.isLoading = alert.status === 'LOADING';
-      }),
-      tap(() => {
-        this.error = '';
-        this.emailSent = '';
-        this.deactivateDeleteMessage = '';
-      })).
-      subscribe(alert => {
-        if (alert.status === 'SUCCESS') {
-          this.handleAuthSuccess(alert);
-        } else if (alert.status === 'ERROR') {
-          this.error = alert.message || 'unknown error';
-        }
-    })
+    this.storeSub = this.store.select(getAuthState).subscribe(data => {
+      this.alert = data.alert;
+      this.isLoading = data.isLoading;
 
-    /**
-     * CROSS COMPONENT ALERT
-     */
-    this.databaseService.crossComponentAlert$.pipe(
-      take(1),
-      finalize(() => this.databaseService.crossComponentAlert$.next(null))
-    ).subscribe(alert => {
-      if (alert && (alert.action === 'DEACTIVATE_USER' || alert?.action === 'DELETE_USER')) {
-        this.deactivateDeleteMessage = alert.message || 'User deactivate/deleted';
+      // check if user is logged in or signed up
+      this.loggedIn = !!data.user;
+      if (this.loggedIn) {
+        setTimeout(() => {
+          this.router.navigate(['/accounts']);
+        }, 500);
+      } else if (data.signedupEmail && !this.isLoginMode) {
+        this.router.navigate(['/auth/signup/verification']);
       }
     })
 
-  }
-
-  private handleAuthSuccess(alert: ServerAlert.ServerAlert): void {
-    const action = alert.action;
-    if (action === 'LOGIN') {
-      this.loggedIn = true;
-      setTimeout(() => {
-        this.router.navigate(['/accounts']);
-      }, 500);
-    } else if (action === 'SIGNUP') {
-      this.authService.signedup$.next({ 
-        email: this.signupForm.get('email')?.value,
-        message: alert.message || 'Signeup successfully' });
-      this.router.navigate(['/auth/signup/verification']);
-    } else if (action === 'RESEND_EMAIL') {
-      this.emailSent = alert.message || 'Email Sent again';
-    }
   }
 
   private initForms() {
@@ -120,20 +88,16 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.isLoginMode) {
-      this.authService.login(this.loginForm.value);
+      this.store.dispatch(AuthActions.loginStart({ loginData: this.loginForm.value }));
     } else {
-      const { name, email, passwordData: { password, passwordConfirm } } = this.signupForm.value;
-      this.authService.signup({ name, email, password, passwordConfirm });      
+      const { name, email, passwordData: { password, passwordConfirm } } = this.signupForm.value;   
+      this.store.dispatch(AuthActions.signupStart({ signupData: { name, email, password, passwordConfirm } }))
     }
-  }
-
-  reSendEmail(): void {
-    this.authService.reSendEmail(this.loginForm.get('email')?.value);
   }
 
   onForgotPassword(): void {
     this.modalService.open(ForgotPasswordComponent, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
-      
+      this.store.dispatch(AuthActions.forgotPassword(result));
     }, (reason) => {
       
     });

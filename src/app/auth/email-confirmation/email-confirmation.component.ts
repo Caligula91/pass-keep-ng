@@ -1,11 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Store } from '@ngrx/store';
+import * as fromApp from '../../store/app.reducer';
+import * as AuthActions from '../store/auth.actions';
 import { Subscription } from 'rxjs';
-import { filter, tap } from 'rxjs/operators';
-import { DatabaseService } from 'src/app/shared/services/database.service';
-import { AuthService } from '../auth.service';
 import * as CustomValidators from '../../shared/custom-validators';
+import { getAuthState } from '../store/auth.selector';
+import { Alert } from 'src/app/shared/models/alert.model';
 
 
 @Component({
@@ -15,36 +17,27 @@ import * as CustomValidators from '../../shared/custom-validators';
 })
 export class EmailConfirmationComponent implements OnInit, OnDestroy {
 
-  userEmail: string = '';
   pinForm!: FormGroup;
-  alertSub!: Subscription;
-  success: string = '';
-  error: string = '';
   isLoading: boolean = false;
+  alert: Alert | null = null;
+  finished: boolean = false;
+  private storeSub!: Subscription;
 
-  constructor(private authService: AuthService, private route: ActivatedRoute, private databaseService: DatabaseService) { }
+  constructor(private store: Store<fromApp.AppState>, private route: ActivatedRoute) { }
 
   ngOnDestroy(): void {
-    this.alertSub.unsubscribe();
+    this.storeSub.unsubscribe();
+    this.store.dispatch(AuthActions.clearAlert());
   }
 
-  ngOnInit(): void {    
-    this.alertSub = this.databaseService.serverAlert$.pipe(
-      filter(alert => alert.action === 'CONFIRM_EMAIL'),
-      tap(alert => this.isLoading = alert.status === 'LOADING'),
-      tap(() => {
-        this.error = '';
-        this.success = '';
-      })
-    ).subscribe(alert => {
-      if (alert.status === 'SUCCESS') {
-        this.success = alert.message || 'User verified';
-      } else if (alert.status === 'ERROR') {
-        this.error = alert.message || 'unknown error';
-      }
+  ngOnInit(): void { 
+    
+    this.storeSub = this.store.select(getAuthState).subscribe(data => {
+      this.isLoading = data.isLoading;
+      this.alert = data.alert;
+      this.finished = data.alert?.type === 'SUCCESS'
     })
-
-
+    
     this.pinForm = new FormGroup({
       pin: new FormControl(null, [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern(/^[0-9]*$/)]),
       pinConfirm: new FormControl(null, [Validators.required, Validators.minLength(4), Validators.maxLength(4), Validators.pattern(/^[0-9]*$/)])
@@ -53,7 +46,7 @@ export class EmailConfirmationComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     const emailToken = this.route.snapshot.params['emailToken'];
-    this.authService.confirmEmail(emailToken, this.pinForm.value).subscribe(email => this.userEmail = email);
+    this.store.dispatch(AuthActions.confirmEmail({ emailToken, pinData: this.pinForm.value }));
   }
 
 }

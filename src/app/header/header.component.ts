@@ -1,9 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { select, Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from '../auth/store/auth.actions';
 import { AccountsService } from '../accounts/accounts.service';
-import { AuthService } from '../auth/auth.service';
+import { User } from '../auth/user.model';
 import { Account } from '../shared/models/account.model';
+import { getUser } from '../auth/store/auth.selector';
 
 @Component({
   selector: 'app-header',
@@ -12,36 +15,26 @@ import { Account } from '../shared/models/account.model';
 })
 export class HeaderComponent implements OnInit, OnDestroy {
 
-  authSub!: Subscription;
-  name: string | undefined;
+  storeSub!: Subscription;
+  user: User | null = null
   accountsObs!: Observable<Account[]>;
 
-  constructor(private authService: AuthService, private accountsService: AccountsService) { }
+  constructor(private accountsService: AccountsService, private store: Store<fromApp.AppState>) { }
 
   ngOnDestroy(): void {
-    this.authSub.unsubscribe();
+    this.storeSub.unsubscribe();
   }
 
-  /**
-   * LISTEN WHEN LOGGED IN/OUT AND UPDATE HEADER ACCORDINGLY
-   */
   ngOnInit(): void {
-    this.authSub = this.authService.user$.pipe(
-      tap(user => {
-        if (user) {
-          this.name = user.name;
-          this.accountsService.fetchAccounts();
-        } else {
-          this.name = '';
-        }
-      }),
-    ).subscribe();
+
+    this.storeSub = this.store.pipe(select(getUser)).subscribe(user => this.user = user);
 
     this.accountsObs = this.accountsService.accounts$;
+    
   }
 
   logout(): void {
-    this.authService.logout();
+    this.store.dispatch(AuthActions.logout());
   }
 
 }

@@ -9,26 +9,11 @@
         <div class="row justify-content-center align-items-center">
             <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
 
-                <!-- SUCCESS -->
-                <div 
-                    *ngIf="success"
-                    class="alert alert-success alert-dismissible fade show" role="alert">
-                    <p>{{ success }}</p>
-                    <p>You can safely close this tab</p>
-                </div>
-
-                <!-- ERROR -->
-                <div 
-                    *ngIf="error"
-                    class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ error }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+                <!-- ALERT -->
+                <app-alert *ngIf="alert" [alert]="alert"></app-alert>
 
                 <!-- PIN FORM -->
-                <form *ngIf="!success" (ngSubmit)="onSubmit()" [formGroup]="pinForm">
+                <form *ngIf="!finished" (ngSubmit)="onSubmit()" [formGroup]="pinForm">
                     <h4 style="text-align: center; margin-bottom: 30px;">Setup your pin code</h4>
                     <div class="form-group">
                         <label for="pin">New PIN</label>

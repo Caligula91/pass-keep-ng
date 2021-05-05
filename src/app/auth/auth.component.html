@@ -1,51 +1,8 @@
 <div class="row justify-content-center align-items-center auth">
     <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
 
-        <!-- DEACTIVATE/DELETE -->
-        <div *ngIf="deactivateDeleteMessage"
-            class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ deactivateDeleteMessage }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-
         <!-- ALERT -->
-        <div *ngIf="error">
-
-
-            <!-- ERROR -->
-            <div *ngIf="error!=='Please Verify Your Email!'; else warningError" class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ error }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            
-            <!-- WARNING -->
-            <ng-template #warningError>
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <h4>{{ error }}</h4>
-                    <p>
-                        You didn't receive an email? 
-                        <a style="cursor: pointer; color: blue;" (click)="reSendEmail()">Click Here</a>
-                            so we can send you another one or contact <a style="cursor: pointer; color: blue;">support</a>               
-                    </p>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            </ng-template>
-        </div>
-
-        <!-- EMAIL SENT AGAIN -->
-        <div *ngIf="emailSent"
-            class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ emailSent }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+        <app-alert *ngIf="alert" [alert]="alert"></app-alert>
 
         <!-- LOGIN SUCCESS -->
         <div *ngIf="loggedIn" style="text-align: center; margin-top: 50px;">

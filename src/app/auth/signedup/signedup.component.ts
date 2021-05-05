@@ -1,8 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { filter, take, tap } from 'rxjs/operators';
-import { DatabaseService } from 'src/app/shared/services/database.service';
-import { AuthService } from '../auth.service';
+import * as AuthActions from '../store/auth.actions';
+import * as fromApp from '../../store/app.reducer';
+import { getAuthState } from '../store/auth.selector';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-signedup',
@@ -13,37 +15,33 @@ export class SignedupComponent implements OnInit, OnDestroy {
 
   isLoading: boolean = false;
   message: string = '';
-  private alertSub!: Subscription;
+  email: string = '';
+  private storeSub!: Subscription;
   
-  constructor(private databaseService: DatabaseService, private authService: AuthService) { }
+  constructor(private store: Store<fromApp.AppState>, private router: Router) { }
 
   ngOnDestroy(): void {
-    this.alertSub.unsubscribe();
+    this.storeSub.unsubscribe();
+    this.store.dispatch(AuthActions.clearSignedupEmail());
   }
 
   ngOnInit(): void {
-    this.alertSub = this.databaseService.serverAlert$.pipe(
-      filter(alert => {
-        return alert.action === 'RESEND_EMAIL';
-      }),
-      tap(alert => this.isLoading = alert.status === 'LOADING'),
-      filter(alert => alert.status !== 'LOADING')
-    ).subscribe(alert => {
-      this.message = alert.message || 'something happened';
+
+    this.storeSub = this.store.select(getAuthState).subscribe(data => {
+      this.email = data.signedupEmail || '';
+      this.message = data.alert?.message || '';
+      this.isLoading = data.isLoading;
     })
 
   }
 
   reSendEmail(): void {
-    this.authService.signedup$.pipe(
-      take(1),
-      tap(data => {
-        if (data) {
-          this.authService.reSendEmail(data?.email);
-          this.message = data.message;
-        }
-      })
-    ).subscribe();
+    this.store.dispatch(AuthActions.ResendEmailConfirm({ email: this.email }));
+  }
+
+  onBackToSignup(): void {
+    this.store.dispatch(AuthActions.clearSignedupEmail());
+    this.router.navigate(['/auth/signup']);
   }
 
 }

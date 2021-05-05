@@ -1,0 +1,16 @@
+<ng-container *ngIf="alert">
+
+    <ngb-alert 
+        [ngClass]="{ 
+            'alert-danger': alert.type === 'ERROR', 
+            'alert-success': alert.type === 'SUCCESS',
+            'alert-warning': alert.type === 'WARNING',
+            'alert-primary': alert.type === 'PRIMARY'
+        }"
+        [dismissible]="alert.dismissible"
+        (closed)="onClosed()">
+        <p>{{ alert.message }}</p>
+        <a *ngIf="alert.action" class="clickable" (click)="onAction(alert.action)">{{ alert.action | alertActionMessage}}</a>
+    </ngb-alert>
+
+</ng-container>

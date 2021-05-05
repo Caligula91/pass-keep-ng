@@ -31,18 +31,18 @@ export class UserService {
     );
   }
 
-  private handleUpdateName(res: ServerResponse.UpdateUser): void {
-    const { user: { _id, email, name,  } } = res;
-    this.authService.user$.pipe(
-      take(1),
-      tap(user => {
-        if (user) {
-          const userObj = new User(_id, email, name, user.token, String(user.tokenExpires));
-          this.authService.handleAuthentication(userObj);
-        }
-      })
-    ).subscribe();
-  }
+  // private handleUpdateName(res: ServerResponse.UpdateUser): void {
+  //   const { user: { _id, email, name,  } } = res;
+  //   this.authService.user$.pipe(
+  //     take(1),
+  //     tap(user => {
+  //       if (user) {
+  //         const userObj = new User(_id, email, name, user.token, String(user.tokenExpires));
+  //         // this.authService.handleAuthentication(userObj);
+  //       }
+  //     })
+  //   ).subscribe();
+  // }
 
   updateName(updateData: { name: string }): Observable<ServerResponse.User> {
     const url = `${environment.API_HOST}users/me`;
@@ -54,7 +54,7 @@ export class UserService {
         return throwError(error);
       }),
       tap(() => this.databaseService.emmitSuccess(action, 'User name updated')),
-      tap(user => this.handleUpdateName(user)),
+      //tap(user => this.handleUpdateName(user)),
       map(res => res.user),
     );
   }
@@ -62,7 +62,7 @@ export class UserService {
   private handleUpdatePassword(res: ServerResponse.UpdatePassword) {
     const { token, tokenExpires, user: { _id, email, name,  } } = res;
     const userObj = new User(_id, email, name, token, tokenExpires);
-    this.authService.handleAuthentication(userObj);
+    // this.authService.handleAuthentication(userObj);
   }
 
   updatePassword(passwordData: { passwordCurrent: string, password: string, passwordConfirm: string }): Observable<ServerResponse.User> {
@@ -90,7 +90,7 @@ export class UserService {
         return throwError(error);
       }),
       tap(res => this.databaseService.crossComponentAlert$.next({ status: ServerAlert.Status.Success, action, message: res.message })),
-      tap(() => this.authService.logout())
+      // tap(() => this.authService.logout())
     ).subscribe()
   }
 
@@ -105,7 +105,7 @@ export class UserService {
       }),
       tap(res => 
         this.databaseService.crossComponentAlert$.next({ status: ServerAlert.Status.Success, action, message: res.message })),
-      tap(() => this.authService.logout())
+     // tap(() => this.authService.logout())
     ).subscribe()
   }
 

@@ -8,7 +8,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <!-- LOGGED IN -->
         <!-- LEFT -->
-        <ul *ngIf="name" class="navbar-nav mr-auto">
+        <ul *ngIf="user" class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a 
                     class="nav-link" 
@@ -32,7 +32,7 @@
         </ul>
         
         <!-- RIGHT -->
-        <ul  *ngIf="name" class="navbar-nav mr-right">
+        <ul  *ngIf="user" class="navbar-nav mr-right">
             <li class="nav-item">
                 <a 
                     class="nav-link"
@@ -40,7 +40,7 @@
                     routerLinkActive="active"
                     data-toggle="collapse" 
                     data-target=".navbar-collapse.show">
-                    {{ name | firstWord }}
+                    {{ user.name | firstWord }}
                 </a>
             </li>
             <li class="nav-item">
@@ -55,8 +55,8 @@
         </ul>
 
         <!-- NOT LOGGED -->
-        <ul *ngIf="!name" class="navbar-nav mr-auto"></ul>
-        <ul  *ngIf="!name" class="navbar-nav mr-right">
+        <ul *ngIf="!user" class="navbar-nav mr-auto"></ul>
+        <ul  *ngIf="!user" class="navbar-nav mr-right">
             <li class="nav-item">
                 <a 
                     class="nav-link" 
