@@ -112,3 +112,11 @@ table tr td:nth-child(2) {
   text-align: center;
   padding-right: 36px;
 }
+
+.updating-spinner {
+  height: 163px;
+  padding-top: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  margin-bottom: 20px;
+}

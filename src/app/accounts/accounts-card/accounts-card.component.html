@@ -1,132 +1,145 @@
-<!-- VIEW MODE -->
-<div class="card flex-row flex-wrap" *ngIf="!editMode; else editTemplate">
-    <div class="card-header border-0">
-        <img class="account-image" src="{{ account.image }}" alt="account-image">
-    </div>
-    <div class="card-block" >
-        <h4 class="card-title">{{ account.name }}</h4>
-        <table class="card-table">
-            <tr>
-                <td>
-                    <svg-icon 
-                        src="assets/user.svg"
-                        [svgStyle]="{ 'height.px':22, 'width.px':22}">
-                    </svg-icon>
-                </td>
-                <td>{{(account.userEmail)?account.userEmail:'--------------------' }}</td>
-            </tr>
-            <tr>
-                <td>
-                    <svg-icon 
-                        src="assets/key.svg" 
-                        [svgStyle]="{ 'height.px':22, 'width.px':22}">
-                    </svg-icon>
-                </td>
-                <td>
-                    <div class="spinner" *ngIf="isLoading && activeCard === account.id">
-                        <app-loading-dots></app-loading-dots>
-                    </div>
-                    <a 
-                        [ngClass]="ClickTargets.ShowPassword" 
-                        class="clickable reveal-password" 
-                        *ngIf="(!password && !isLoading) || activeCard !== account.id">
-                        SHOW PASSWORD
-                    </a>
-                    <ng-container *ngIf="password && !isLoading && activeCard === account.id">
-                        <span style="color: red; text-align: right;">{{ password }} </span>
-                        <span class="timer">{{ secondsLeft }}</span>
-                    </ng-container>
-                    
-                </td>
-            </tr>
-        </table>
-        <p class="card-text" style="margin-bottom: 0; margin-top: 8px;">
-            <small style="padding-left: 37px;" class="card-text w-100 text-muted">
-                last modified: {{ account.modified | date:'medium' }}
-            </small>
-        </p>
-        
 
-        <!-- DORPDOWN MENU -->
-        <div class="dropdown">
-            <div class="btn-group dropleft">
-                <button type="button" class="menu-button" id="dropdownMenuButton_1" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <img class="menu-image" src="/assets/menu.png" alt="...">
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton_1">
-                    <a [ngClass]="ClickTargets.StartEdit" class="dropdown-item clickable">Edit</a>
-                    <a [ngClass]="ClickTargets.DeleteAccount" class="dropdown-item clickable"><span style="color: red;">Delete</span></a>
-                </div>
-            </div>
+<ng-container *ngIf="!isLoading; else loading">
+
+    <!-- VIEW MODE -->
+    <div class="card flex-row flex-wrap" *ngIf="!editMode; else editTemplate">
+        <div class="card-header border-0">
+            <img class="account-image" src="{{ account.image }}" alt="account-image">
         </div>
-    </div>
-    <img class="menu-image-mobile clickable" (click)="onOpenMenu()" src="/assets/menu.png" alt="...">
-</div>
-
-<!-- EDIT MODE -->
-<ng-template #editTemplate> 
-    <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
-        <div class="card flex-row flex-wrap">
-            <div class="card-header border-0">
-                <img class="account-image" [src]="previewEditImage" alt="account-image">
-                <div style="position: relative; height: 100%;">
-                    <img
-                        [ngClass]="ClickTargets.AddImage" 
-                        class="edit-icon clickable" 
-                        src="/assets/plus.png" 
-                        alt="edit'-'icon">
-                </div>
-            </div>
-            <div class="card-block px-2">
-                <div class="form-group card-text">
-                    <small class="w-100 text-muted">Account Name</small>
-                    <input name="name" type="text" class="form-control" formControlName="name" placeholder="{{ account.name }}">
-                </div>
-                <div class="form-group card-text">
-                    <small class="w-100 text-muted">User/Email</small>
-                    <input name="userEmail" type="text" class="form-control" formControlName="userEmail">
-                </div>
-                <div class="form-group card-text">
-                    <small class="w-100 text-muted">Password</small>
-
-                        <div class="input-group">
-                            <input name="password" [type]="fieldTextType ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="new password">
-                            <div class="input-group-append">
-                                <img
-                                    [ngClass]="ClickTargets.PasswordVisibility"
-                                    class="input-group-text clickable" 
-                                    [src]="(fieldTextType)?'/assets/show-password.png':'/assets/hide-password.png'" 
-                                    alt="show-hide">
-                            </div>
+        <div class="card-block" >
+            <h4 class="card-title">{{ account.name }}</h4>
+            <table class="card-table">
+                <tr>
+                    <td>
+                        <svg-icon 
+                            src="assets/user.svg"
+                            [svgStyle]="{ 'height.px':22, 'width.px':22}">
+                        </svg-icon>
+                    </td>
+                    <td>{{(account.userEmail)?account.userEmail:'--------------------' }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        <svg-icon 
+                            src="assets/key.svg" 
+                            [svgStyle]="{ 'height.px':22, 'width.px':22}">
+                        </svg-icon>
+                    </td>
+                    <td>
+    
+                        <!-- LOADING -->
+                        <div class="spinner" *ngIf="fetchingPassword">
+                            <app-loading-dots></app-loading-dots>
                         </div>
-                </div>
-                <div class="card-buttons">
-                    <button class="btn btn-success">save</button>
-                    <button
-                        [ngClass]="ClickTargets.ButtonExit" 
-                        type="button" 
-                        class="btn btn-primary">exit
-                    </button>
-                </div>
-            </div>
+    
+                        <a 
+                            [ngClass]="ClickTargets.ShowPassword" 
+                            class="clickable reveal-password" 
+                            *ngIf="!password && !fetchingPassword">
+                            SHOW PASSWORD
+                        </a>
+                        <ng-container *ngIf="password && !fetchingPassword">
+                            <span style="color: red; text-align: right;">{{ password }} </span>
+                            <span class="timer">{{ secondsLeft }}</span>
+                        </ng-container>
+                        
+                    </td>
+                </tr>
+            </table>
+            <p class="card-text" style="margin-bottom: 0; margin-top: 8px;">
+                <small style="padding-left: 37px;" class="card-text w-100 text-muted">
+                    last modified: {{ account.modified | date:'medium' }}
+                </small>
+            </p>
             
+    
             <!-- DORPDOWN MENU -->
             <div class="dropdown">
                 <div class="btn-group dropleft">
-                    <button type="button" class="menu-button" id="dropdownMenuButton_2" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
+                    <button type="button" class="menu-button" id="dropdownMenuButton_1" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
                         <img class="menu-image" src="/assets/menu.png" alt="...">
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton_2">
-                        <a [ngClass]="ClickTargets.EndEdit" class="dropdown-item clickable">Exit</a>
-                        <a [ngClass]="ClickTargets.DeleteAccount" class="dropdown-item clickable"><span
-                                style="color: red;">Delete</span></a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton_1">
+                        <a [ngClass]="ClickTargets.StartEdit" class="dropdown-item clickable">Edit</a>
+                        <a [ngClass]="ClickTargets.DeleteAccount" class="dropdown-item clickable"><span style="color: red;">Delete</span></a>
                     </div>
                 </div>
             </div>
         </div>
         <img class="menu-image-mobile clickable" (click)="onOpenMenu()" src="/assets/menu.png" alt="...">
-    </form>
+    </div>
+    
+    <!-- EDIT MODE -->
+    <ng-template #editTemplate> 
+        <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+            <div class="card flex-row flex-wrap">
+                <div class="card-header border-0">
+                    <img class="account-image" [src]="previewEditImage" alt="account-image">
+                    <div style="position: relative; height: 100%;">
+                        <img
+                            [ngClass]="ClickTargets.AddImage" 
+                            class="edit-icon clickable" 
+                            src="/assets/plus.png" 
+                            alt="edit'-'icon">
+                    </div>
+                </div>
+                <div class="card-block px-2">
+                    <div class="form-group card-text">
+                        <small class="w-100 text-muted">Account Name</small>
+                        <input name="name" type="text" class="form-control" formControlName="name" placeholder="{{ account.name }}">
+                    </div>
+                    <div class="form-group card-text">
+                        <small class="w-100 text-muted">User/Email</small>
+                        <input name="userEmail" type="text" class="form-control" formControlName="userEmail">
+                    </div>
+                    <div class="form-group card-text">
+                        <small class="w-100 text-muted">Password</small>
+    
+                            <div class="input-group">
+                                <input name="password" [type]="fieldTextType ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="new password">
+                                <div class="input-group-append">
+                                    <img
+                                        [ngClass]="ClickTargets.PasswordVisibility"
+                                        class="input-group-text clickable" 
+                                        [src]="(fieldTextType)?'/assets/show-password.png':'/assets/hide-password.png'" 
+                                        alt="show-hide">
+                                </div>
+                            </div>
+                    </div>
+                    <div class="card-buttons">
+                        <button class="btn btn-success">save</button>
+                        <button
+                            [ngClass]="ClickTargets.ButtonExit" 
+                            type="button" 
+                            class="btn btn-primary">exit
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- DORPDOWN MENU -->
+                <div class="dropdown">
+                    <div class="btn-group dropleft">
+                        <button type="button" class="menu-button" id="dropdownMenuButton_2" data-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            <img class="menu-image" src="/assets/menu.png" alt="...">
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton_2">
+                            <a [ngClass]="ClickTargets.EndEdit" class="dropdown-item clickable">Exit</a>
+                            <a [ngClass]="ClickTargets.DeleteAccount" class="dropdown-item clickable"><span
+                                    style="color: red;">Delete</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img class="menu-image-mobile clickable" (click)="onOpenMenu()" src="/assets/menu.png" alt="...">
+        </form>
+    </ng-template>
+</ng-container>
+
+<ng-template #loading>
+    <div class="spinner updating-spinner">
+        <app-loading-spinner></app-loading-spinner>
+    </div>
 </ng-template>
 

@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Store } from '@ngrx/store';
+import * as fromApp from '../../../store/app.reducer';
+import * as AccountsActions from '../../store/accounts.actions';
 import { map, take } from 'rxjs/operators';
 import { AccountsService } from '../../accounts.service';
 
@@ -12,7 +15,7 @@ export class AccountsFilterComponent implements OnInit {
 
   filterForm!: FormGroup;
 
-  constructor(private accountsService: AccountsService) { }
+  constructor(private accountsService: AccountsService, private store: Store<fromApp.AppState>) { }
 
   ngOnInit(): void {
     
@@ -46,7 +49,7 @@ export class AccountsFilterComponent implements OnInit {
   }
 
   onReload(): void {
-    this.accountsService.fetchAccounts();
+    this.store.dispatch(AccountsActions.fetchAccounts());
   }
 
 }

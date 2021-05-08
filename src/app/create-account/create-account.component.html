@@ -6,18 +6,7 @@
             <app-loading-spinner *ngIf="isLoading"></app-loading-spinner>
         </div>
 
-        <!-- ALERT -->  
-        <div 
-            *ngIf="error || success" 
-            [ngClass]="{ 'alert-danger': error, 'alert-success': success }" 
-            class="alert alert-dismissible fade show" 
-            role="alert">
-            <p>{{ error || success }}</p>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <a class="clickable" [routerLink]="['/accounts']">to accounts</a>
-        </div>
+        <app-alert *ngIf="alert" [alert]="alert" store="accounts"></app-alert>
 
         <!-- FORM -->
         <form *ngIf="!isLoading" [formGroup]="createForm" (ngSubmit)="onSubmit()">

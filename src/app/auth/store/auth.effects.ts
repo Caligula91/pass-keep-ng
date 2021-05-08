@@ -1,7 +1,10 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { Store } from "@ngrx/store";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, switchMap, tap } from "rxjs/operators";
+import * as fromApp from '../../store/app.reducer';
+import * as AccountsActions from '../../accounts/store/accounts.actions';
 import { AuthService } from "../auth.service";
 import * as AuthActions from './auth.actions';
 import * as ServerResponse from '../../shared/models/server-response.model';
@@ -50,7 +53,7 @@ export class AuthEffects {
         })
     ))
 
-    $confirmEmail = createEffect(() => this.actions$.pipe(
+    confirmEmail$ = createEffect(() => this.actions$.pipe(
         ofType(AuthActions.confirmEmail),
         switchMap(action => {
             const { emailToken, pinData } = action;
@@ -103,12 +106,21 @@ export class AuthEffects {
             try {
                 user = new User(user._id, user.email, user.name, user.token, user.tokenExpires);
                 if (user.isTokenValid()) return this.handleAuth(user, { redirect: action.redirect });
-                else localStorage.removeItem('user');
+                else {
+                    localStorage.removeItem('user');
+                    return { type: 'DUMMY' };
+                }
             } catch (error) {
                 localStorage.removeItem('user');
+                return { type: 'DUMMY' };
             }
         })
     ))
+
+    authSuccess$ = createEffect(() => this.actions$.pipe(
+        ofType(AuthActions.authSuccess),
+        tap(() => this.store.dispatch(AccountsActions.fetchAccounts()))
+    ), { dispatch: false })
 
     logout$ = createEffect(() => this.actions$.pipe(
         ofType(AuthActions.logout),
@@ -161,7 +173,8 @@ export class AuthEffects {
         private actions$: Actions,
         private http: HttpClient,
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private store: Store<fromApp.AppState>
     ) {}
 
 

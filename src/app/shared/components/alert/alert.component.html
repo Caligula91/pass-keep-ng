@@ -10,7 +10,10 @@
         [dismissible]="alert.dismissible"
         (closed)="onClosed()">
         <p>{{ alert.message }}</p>
-        <a *ngIf="alert.action" class="clickable" (click)="onAction(alert.action)">{{ alert.action | alertActionMessage}}</a>
+        <ng-container *ngIf="alert.action" >
+            <hr>
+            <a class="clickable alert-link" (click)="onAction(alert.action)">{{ alert.action | alertActionMessage}}</a>
+        </ng-container>
     </ngb-alert>
 
 </ng-container>

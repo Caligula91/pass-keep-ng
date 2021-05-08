@@ -6,32 +6,12 @@
 
             <!-- ACCOUNT CARDS -->
             <div *ngFor="let account of results" >
-                <!-- ERROR -->
-                <div *ngIf="error && account.id===alertAccountId" class="alert alert-danger alert-dismissible fade show"
-                    role="alert" style="margin-top: 40px;">
-                    {{ error }}
-                    <p *ngIf="resetPin">Go to your profile info, click on settings (three dots) and choose 'Reset PIN'</p>
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-        
-                <!-- SUCCESS -->
-                <div *ngIf="success && account.id===alertAccountId" class="alert alert-success alert-dismissible fade show" role="alert"
-                    style="margin-top: 40px;">
-                    {{ success }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            
-                <div *ngIf="updating && account.id===alertAccountId" class="spinner">
-                    <app-loading-spinner></app-loading-spinner>
-                </div>
+
+                <!-- ALERT -->
+                <app-alert *ngIf="alert && account.id === alertAccountId" [alert]="alert" store="accounts"></app-alert>
 
                 <!-- ACCOUNT CARD -->
                 <app-accounts-card
-                    *ngIf="!updating || account.id!==alertAccountId" 
                     [account]="account" 
                     class="account-card" 
                     [id]="account.id">

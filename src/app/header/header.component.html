@@ -16,7 +16,7 @@
                     routerLinkActive="active"
                     data-toggle="collapse" 
                     data-target=".navbar-collapse.show">
-                    Accounts({{ (accountsObs | async)?.length }})
+                    Accounts({{ (accounts$ | async)?.length }})
                 </a>
             </li>
             <li class="nav-item">

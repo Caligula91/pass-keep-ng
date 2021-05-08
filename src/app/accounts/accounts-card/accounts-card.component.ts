@@ -1,16 +1,17 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { filter, tap } from 'rxjs/operators';
+import * as fromApp from '../../store/app.reducer';
+import * as AccountsActions from '../store/accounts.actions';
 import { CardChoiceComponent } from 'src/app/shared/modals/card-choice/card-choice.component';
 import { Account } from 'src/app/shared/models/account.model';
-import { DatabaseService } from 'src/app/shared/services/database.service';
 import { IconsSelectorComponent } from '../../shared/modals/icons-selector/icons-selector.component';
 import { AccountsService } from '../accounts.service';
 
 import { ClickTargets } from './click-targets.model';
+import { getAccountsState } from '../store/accounts.selector';
 
 @Component({
   selector: 'app-accounts-card',
@@ -25,12 +26,11 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
   editForm!: FormGroup;
   previewEditImage!: string;
   password: string = '';
-  private sub!: Subscription;
-  private alertSub!: Subscription;
+  private accountModeSub!: Subscription;
   isLoading: boolean = false;
+  fetchingPassword: boolean = false;
   private intervalId: any;
   secondsLeft: number = 5;
-  activeCard: string = '';
 
   public get ClickTargets() {
     return ClickTargets; 
@@ -39,18 +39,17 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
   constructor(
     private modalService: NgbModal, 
     private accountsService: AccountsService,
-    private databaseService: DatabaseService) { }
+    private store: Store<fromApp.AppState>) { }
 
   ngOnDestroy(): void {
-    this.sub.unsubscribe();
-    this.alertSub.unsubscribe();
+    this.accountModeSub.unsubscribe();
     clearInterval(this.intervalId); 
   }
   
   ngOnInit(): void {
     this.previewEditImage = this.account.image
     
-    this.sub = this.accountsService.accountAction$.subscribe(data => {
+    this.accountModeSub = this.accountsService.accountAction$.subscribe(data => {
       if (data.accountId === this.account.id) {
         switch (data.type) {
           case ClickTargets.StartEdit: {
@@ -71,19 +70,6 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
           case ClickTargets.DeleteAccount: {
             break;
           }
-          case ClickTargets.ShowPassword: {
-            this.password = data.payload ? data.payload : '';
-            if (this.intervalId) clearInterval(this.intervalId);
-            this.intervalId = setInterval(() => {
-              this.secondsLeft--;
-              if (this.secondsLeft === 0) {
-                this.secondsLeft = 5;
-                clearInterval(this.intervalId);
-                this.password = '';
-              } 
-            }, 1000);
-            break;
-          }
           case ClickTargets.AddImage: {
             this.openIconsSelector();
             break;
@@ -102,16 +88,27 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
       }
     })
 
-    this.alertSub = this.databaseService.serverAlert$.pipe(
-      filter(alert => alert.action === 'GET_ACCOUNT_PASSWORD'),
-    ).subscribe(alert => {
-      if (alert.status === 'LOADING') {
-        this.isLoading = true;
-        this.activeCard = String(alert.payload) || '';
-      } else {
-        this.isLoading = false;
+    this.store.select(getAccountsState).subscribe(data => {
+      if (data.focusedAccount === this.account.id) {
+        if (data.password) this.handlePassword(data.password);
+        this.isLoading = data.isLoading;
+        this.fetchingPassword = data.fetchingPassword;
       }
     })
+
+  }
+
+  private handlePassword(password: string): void {
+    this.password = password;
+    if (this.intervalId) clearInterval(this.intervalId);
+    this.intervalId = setInterval(() => {
+      this.secondsLeft--;
+      if (this.secondsLeft === 0) {
+        this.secondsLeft = 5;
+        clearInterval(this.intervalId);
+        this.password = '';
+      } 
+    }, 1000);
   }
 
   /**
@@ -151,7 +148,7 @@ export class AccountsCardComponent implements OnInit, OnDestroy {
     if (this.account.name === this.editForm.get('name')?.value) {
       this.editForm.get('name')?.setValue('');
     }
-    this.accountsService.updateAccount(this.account.id, this.editForm.value);
+    this.store.dispatch(AccountsActions.updateAccount({ accountId: this.account.id, updateFields: this.editForm.value }));
     this.endEditMode();
   }
 

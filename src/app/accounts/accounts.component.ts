@@ -1,7 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { filter, takeWhile, tap } from 'rxjs/operators';
-import { DatabaseService } from '../shared/services/database.service';
+import { Alert } from '../shared/models/alert.model';
+import * as fromApp from '../store/app.reducer';
+import * as AccountsActions from './store/accounts.actions';
+import { getAccountsState } from './store/accounts.selector';
 
 @Component({
   selector: 'app-accounts',
@@ -11,38 +14,34 @@ import { DatabaseService } from '../shared/services/database.service';
 export class AccountsComponent implements OnInit, OnDestroy {
 
   isLoading: boolean = false;
-  error: string = '';
-  private alertSub!: Subscription;
+  accountsFetched: boolean = false;
+  alert: Alert | null = null;
+  accountsStoreSub!: Subscription;
+  //  beacuse of race condition, just in case :)
+  reload: boolean = false;
 
-  constructor(private databaseService: DatabaseService) { }
+  constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnDestroy(): void {
-    this.alertSub.unsubscribe();
+    this.accountsStoreSub.unsubscribe();
+    this.store.dispatch(AccountsActions.clearAlert());
   }
 
   ngOnInit(): void {
-
-    // CROSS COMPONENT ALERT
-    this.databaseService.crossComponentAlert$.pipe(
-      filter(alert => alert?.action === 'FETCH_ACCOUNTS'),
-      takeWhile(alert => { return alert?.status === 'LOADING' }, true),
-      tap(alert => this.isLoading = alert?.status === 'LOADING'),
-    ).subscribe(alert => {
-      if (alert?.status === 'ERROR') {
-        this.error = alert.message || 'unknwon error';
+    this.accountsStoreSub = this.store.select(getAccountsState).subscribe(data => {
+      this.accountsFetched = !!data.accounts;
+      if (!data.focusedAccount) {
+        this.alert = data.alert;
+        this.isLoading = data.isLoading;
+      } else {
+        this.alert = null;
       }
-    });
-
-    // REGULAR ALERT
-    this.alertSub = this.databaseService.serverAlert$.pipe(
-      filter(alert => alert.action === 'FETCH_ACCOUNTS'),
-      tap(() => this.error = ''),
-      tap(alert => this.isLoading = alert.status === 'LOADING'),
-    ).subscribe(alert => {
-      if (alert.status === 'ERROR') {
-        this.error = alert.message || 'unknown error';
-      }
+      this.reload = !data.alert && !data.accounts;
     })
+  }
+
+  onReload(): void {
+    this.store.dispatch(AccountsActions.fetchAccounts());
   }
 
 }

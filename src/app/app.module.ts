@@ -45,6 +45,7 @@ import { environment } from 'src/environments/environment';
 import { AlertComponent } from './shared/components/alert/alert.component';
 import { AlertActionMessagePipe } from './shared/components/alert/alert-action-message.pipe';
 import { AuthEffects } from './auth/store/auth.effects';
+import { AccountsEffects } from './accounts/store/accounts.effects';
 
 @NgModule({
   declarations: [
@@ -89,7 +90,7 @@ import { AuthEffects } from './auth/store/auth.effects';
     ReactiveFormsModule,
     AngularSvgIconModule.forRoot(),
     StoreModule.forRoot(fromApp.appReducer),
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, AccountsEffects]),
     StoreDevtoolsModule.instrument({ logOnly: environment.production }),
   ],
   providers: [

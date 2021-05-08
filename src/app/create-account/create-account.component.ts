@@ -1,12 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import * as fromApp from '../store/app.reducer';
+import * as AccountsActions from '../accounts/store/accounts.actions';
 import { AccountsService } from '../accounts/accounts.service';
 import { DatabaseService } from '../shared/services/database.service';
 import { IconsSelectorComponent } from '../shared/modals/icons-selector/icons-selector.component';
 import * as ServerAlert from '../shared/models/server-alert.model';
+import { Alert } from '../shared/models/alert.model';
+import { getAccountsState } from '../accounts/store/accounts.selector';
 
 @Component({
   selector: 'app-create-account',
@@ -17,35 +22,25 @@ export class CreateAccountComponent implements OnInit, OnDestroy {
 
   imagePath: string = `${environment.API_DOMAIN}img/default.png`;
   createForm!: FormGroup;
-  success: string = '';
-  error: string = '';
+  alert: Alert | null = null;
   isLoading: boolean = false;
-  alertSub!: Subscription;
+  storeSub!: Subscription;
 
   constructor(
     private modalService: NgbModal, 
-    private accountService: AccountsService, 
-    private databaseService: DatabaseService) { }
+    private store: Store<fromApp.AppState>) { }
   
   ngOnDestroy(): void {
-    this.alertSub.unsubscribe();
+    // unsubscribe from store and clear alerts
+    this.storeSub.unsubscribe();
+    this.store.dispatch(AccountsActions.clearAlert());
   }
 
   ngOnInit(): void {
-    this.alertSub = this.databaseService.serverAlert$.subscribe((alert) => {
-      if (alert.action === ServerAlert.ActionTypes.AddAccount) {
-        this.error = ''; 
-        this.success = '';
-        this.isLoading = false;
-        if (alert.status === ServerAlert.Status.Success) {
-          this.success = alert.message || 'Success';
-          this.resetForm();
-        } else if (alert.status === ServerAlert.Status.Error) {
-          this.error = alert.message || 'Error';
-        } else if (alert.status === ServerAlert.Status.Loading) {
-          this.isLoading = true;
-        }
-      }
+
+    this.storeSub = this.store.select(getAccountsState).subscribe(data => {
+      this.isLoading = data.isLoading;
+      this.alert = data.alert;
     });
     
     this.createForm = new FormGroup({
@@ -70,7 +65,7 @@ export class CreateAccountComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    this.accountService.addAccount(this.createForm.value);
+    this.store.dispatch(AccountsActions.addAccount({ newAccount: this.createForm.value }));
   }
 
   private resetForm(): void {
