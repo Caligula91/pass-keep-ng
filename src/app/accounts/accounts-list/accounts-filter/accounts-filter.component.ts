@@ -1,21 +1,30 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import * as fromApp from '../../../store/app.reducer';
 import * as AccountsActions from '../../store/accounts.actions';
 import { map, take } from 'rxjs/operators';
 import { AccountsService } from '../../accounts.service';
+import { Subscription } from 'rxjs';
+import { getAccountsState } from '../../store/accounts.selector';
 
 @Component({
   selector: 'app-accounts-filter',
   templateUrl: './accounts-filter.component.html',
   styleUrls: ['./accounts-filter.component.css']
 })
-export class AccountsFilterComponent implements OnInit {
+export class AccountsFilterComponent implements OnInit, OnDestroy {
 
   filterForm!: FormGroup;
+  reloadEnabled: boolean = true;
+  accountsStoreSub!: Subscription;
+  filterOptionsSub!: Subscription;
 
   constructor(private accountsService: AccountsService, private store: Store<fromApp.AppState>) { }
+  ngOnDestroy(): void {
+    this.accountsStoreSub.unsubscribe();
+    this.filterOptionsSub.unsubscribe();
+  }
 
   ngOnInit(): void {
     
@@ -24,7 +33,7 @@ export class AccountsFilterComponent implements OnInit {
       options: new FormControl('name_ASC'),
     });
     
-    this.accountsService.accountsFilter$.pipe(
+    this.filterOptionsSub = this.accountsService.accountsFilter$.pipe(
       take(1),
       map(filterObj => {
         const options = `${filterObj.sortBy}_${filterObj.order}`;
@@ -46,10 +55,14 @@ export class AccountsFilterComponent implements OnInit {
       this.accountsService.accountsFilter$.next({ sortBy, order, search });
     });
 
+    this.accountsStoreSub = this.store.select(getAccountsState).subscribe(data => {
+      this.reloadEnabled = !data.fetchingPassword && !data.isLoading;
+    })
+
   }
 
   onReload(): void {
-    this.store.dispatch(AccountsActions.fetchAccounts());
+    if (this.reloadEnabled) this.store.dispatch(AccountsActions.fetchAccounts());
   }
 
 }

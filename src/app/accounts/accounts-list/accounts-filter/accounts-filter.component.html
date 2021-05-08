@@ -24,7 +24,12 @@
                         <img class="clickable options-image" src="/assets/options.png" alt=":">
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item clickable" (click)="onReload()">Reload</a>
+                        <a 
+                            class="dropdown-item clickable" 
+                            [ngClass]="{'text-muted': !reloadEnabled }" 
+                            (click)="onReload()">
+                            Reload
+                        </a>
                         <a class="dropdown-item clickable" [routerLink]="['/create-account']" style="color: green;">Add</a>
                     </div>
                 </div>

@@ -7,7 +7,7 @@
         <div *ngIf="!isLoading; else loading" class="accounts-list">
 
             <!-- ALERT -->
-            <app-alert *ngIf="alert" [alert]="alert" store="accounts"></app-alert>
+            <app-alert style="margin-top: 10px;" *ngIf="alert" [alert]="alert" store="accounts"></app-alert>
         
             <!-- ACCOUNTS LIST -->
             <app-accounts-list *ngIf="accountsFetched"></app-accounts-list>
