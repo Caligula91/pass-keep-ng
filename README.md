@@ -22,11 +22,10 @@ Pin-code should be kept only in your head. Pin-code can be reset anytime using u
 
 ## Future Plans
 
-1. Implement NgRx (I curse myself why I didn't do it at the begining of development)
-2. Email verification on every signin from different IP
-3. Implement refresh token
-4. Rate limit for specific routes (better security)
-5. Improve CSS style
+1. Email verification on every signin from different IP
+2. Implement refresh token
+3. Rate limit for a specific routes (better security)
+4. Improve CSS style
 
 ## API Documentation
 
