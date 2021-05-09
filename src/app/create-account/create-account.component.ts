@@ -6,10 +6,7 @@ import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import * as fromApp from '../store/app.reducer';
 import * as AccountsActions from '../accounts/store/accounts.actions';
-import { AccountsService } from '../accounts/accounts.service';
-import { DatabaseService } from '../shared/services/database.service';
 import { IconsSelectorComponent } from '../shared/modals/icons-selector/icons-selector.component';
-import * as ServerAlert from '../shared/models/server-alert.model';
 import { Alert } from '../shared/models/alert.model';
 import { getAccountsState } from '../accounts/store/accounts.selector';
 

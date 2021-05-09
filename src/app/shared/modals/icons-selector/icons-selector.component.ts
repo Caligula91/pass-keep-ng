@@ -1,6 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DatabaseService } from '../../services/database.service';
+import { map, tap } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import * as ServerResponse from '../../models/server-response.model';
 
 @Component({
   selector: 'app-icons-selector',
@@ -14,12 +17,13 @@ export class IconsSelectorComponent implements OnInit {
   search: string = '';
 
 
-  constructor(public activeModal: NgbActiveModal, private databaseService: DatabaseService) { }
+  constructor(public activeModal: NgbActiveModal, private http: HttpClient) { }
 
   ngOnInit(): void {
-    this.databaseService.fetchIcons().subscribe((icons) => {
-      this.icons = icons;
-    })
+    this.http.get<ServerResponse.GetImages>(`${environment.API_DOMAIN}img`).pipe(
+      map(res => res.images),
+      tap(icons => this.icons = icons)
+    ).subscribe();
   }
 
   onSelectIcon(event: MouseEvent): void {

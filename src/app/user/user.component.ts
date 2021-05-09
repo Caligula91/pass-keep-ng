@@ -1,13 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
+import * as fromApp from '../store/app.reducer';
+import * as UserActions from './store/user.actions';
 import * as ServerResponse from '../shared/models/server-response.model';
 import * as CustomValidators from '../shared/custom-validators';
-import { UserService } from './user.service';
-import { DatabaseService } from '../shared/services/database.service';
-import { filter, tap } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserOptionsComponent } from '../shared/modals/user-options/user-options.component';
+import { getUserState } from './store/user.selector';
+import { Alert } from '../shared/models/alert.model';
 
 @Component({
   selector: 'app-user',
@@ -16,16 +18,14 @@ import { UserOptionsComponent } from '../shared/modals/user-options/user-options
 })
 export class UserComponent implements OnInit, OnDestroy {
 
-  user!: ServerResponse.User;
-  alertSub!: Subscription;
-  error: string = '';
-  success: string = '';
-  serverError: boolean = false;
+  userStoreSub!: Subscription;
+  user: ServerResponse.User | null = null;
   isLoading: boolean = false;
-  editName: boolean = false;
+  alert: Alert | null = null;
   /**
    * FORMS
    */
+  editName: boolean = false;
   nameForm!: FormGroup;
   passwordForm!: FormGroup;
   deactivateForm!: FormGroup;
@@ -40,7 +40,9 @@ export class UserComponent implements OnInit, OnDestroy {
   resetPinMode: boolean = false;
   viewMode: boolean = true;
 
-  constructor(private userService: UserService, private databaseService: DatabaseService, private modalService: NgbModal) { }
+  constructor(
+    private modalService: NgbModal,
+    private store: Store<fromApp.AppState>) { }
 
   turnOnMode(mode: string) {
     this.editName = false;
@@ -55,12 +57,12 @@ export class UserComponent implements OnInit, OnDestroy {
       this.deleteForm.reset();
       this.pinForm.reset();
     } else {
-      this.error = '';
-      this.success = '';
+      this.alert = null;
     }
   }
   
   private initForms() {
+
     // NAME FORM
     this.nameForm = new FormGroup({
       name: new FormControl(null, [
@@ -97,47 +99,22 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.alertSub.unsubscribe();
+    this.userStoreSub.unsubscribe();
   }
 
   ngOnInit(): void {
 
+    this.store.dispatch(UserActions.fetchUser());
+    
     this.initForms();
 
-    this.alertSub = this.databaseService.serverAlert$.pipe(
-      filter(alert => 
-        alert.action === 'GET_ME' || 
-        alert.action === 'UPDATE_NAME' || 
-        alert.action === 'UPDATE_PASSWORD' ||
-        alert.action === 'DEACTIVATE_USER' ||
-        alert.action === 'DELETE_USER' ||
-        alert.action === 'RESET_PIN'),
-      tap(alert => this.isLoading = alert.status === 'LOADING'),
-      tap(() => {
-        this.error = '';
-        this.success = '';
-        this.serverError = false;
-      })
-    ).subscribe(alert => {
-      // ERROR
-      if (alert.status === 'ERROR') {
-        this.error = alert.message || 'unknown error';
-        this.serverError = alert.payload === 500 || alert.payload === 0;
-
-      // SUCCESS
-      } else if (alert.status === 'SUCCESS') {
-        this.success =  alert.action !== 'GET_ME' 
-          ? alert.message || 'success'
-          : '';
-        if (alert.action === 'UPDATE_PASSWORD' || alert.action === 'RESET_PIN') {
-          this.turnOnMode('viewMode');
-          this.passwordForm.reset();
-          this.pinForm.reset();
-        }
-      }
+    this.userStoreSub = this.store.select(getUserState).subscribe(data => {
+      this.isLoading = data.isLoading;
+      this.user = data.user;
+      this.alert = data.alert;
+      this.nameForm.get('name')?.setValue(this.user?.name);
+      if (this.alert?.type === 'SUCCESS') this.turnOnMode('viewMode');
     });
-
-    this.fetchUserInfo();
   }
 
   /**
@@ -176,39 +153,28 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   onEditName(): void {
-    this.nameForm.get('name')?.setValue(this.user.name);
+    this.nameForm.get('name')?.setValue(this.user?.name);
     this.editName = !this.editName;
   }
 
-  fetchUserInfo(): void {
-    this.userService.fetchUserInfo().subscribe(user => {
-      this.user = user;
-      this.nameForm.get('name')?.setValue(this.user.name);
-    });
-  }
-
   onSubmitUpdateName(): void {
-    this.editName = false;
-    this.userService.updateName(this.nameForm.value).subscribe(user => {
-      this.user = user;
-      this.nameForm.get('name')?.setValue(this.user.name);
-    });
+    this.store.dispatch(UserActions.updateUser({ updateData: this.nameForm.value }));
   }
 
   onSubmitUpdatePassword(): void {
-    this.userService.updatePassword(this.passwordForm.value).subscribe();
+    this.store.dispatch(UserActions.updatePassword({ passwordData: this.passwordForm.value }));
   }
 
   onSubmitDeactivateUser(): void {
-    this.userService.deactivateUser();
+    this.store.dispatch(UserActions.deactivateUser());
   }
 
   onSubmitDeleteUser(): void {
-    this.userService.deleteUser(this.deleteForm.get('password')?.value);
+    this.store.dispatch(UserActions.deleteUser({ password: this.deleteForm.get('password')?.value }));
   }
 
   onSubmitResetPin(): void {
-    this.userService.resetPin(this.pinForm.value);
+    this.store.dispatch(UserActions.resetPin({ pinData: this.pinForm.value }));
   }
 
 }

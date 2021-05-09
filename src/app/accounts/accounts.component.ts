@@ -17,7 +17,6 @@ export class AccountsComponent implements OnInit, OnDestroy {
   accountsFetched: boolean = false;
   alert: Alert | null = null;
   accountsStoreSub!: Subscription;
-  //  beacuse of race condition, just in case :)
   reload: boolean = false;
 
   constructor(private store: Store<fromApp.AppState>) { }

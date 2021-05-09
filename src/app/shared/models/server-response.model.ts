@@ -1,3 +1,14 @@
+export interface User {
+    _id: string,
+    name: string,
+    email: string,
+    role: string,
+    userCreated: string,
+    lastCheckedAccount?: string,
+    lastCheckedAccountDate?: string,
+    totalAccounts?: number,
+}
+
 export interface Accounts extends Array<{
     _id: string,
     name: string,
@@ -9,6 +20,11 @@ export interface Accounts extends Array<{
 export interface GetMe {
     status: string,
     user: User,
+}
+
+export interface FetchAccounts {
+    status: string,
+    accounts: Accounts,
 }
 
 export interface AddAccount {
@@ -87,17 +103,6 @@ export interface UpdatePassword {
     token: string,
     tokenExpires: string,
     user: User,
-}
-
-export interface User {
-    _id: string,
-    accounts: Accounts,
-    name: string,
-    email: string,
-    role: string,
-    userCreated: string,
-    lastCheckedAccount?: string,
-    lastCheckedAccountDate?: string,
 }
 
 export interface DeactivateUser {

@@ -1,10 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
-import { catchError, map, switchMap, tap } from "rxjs/operators";
+import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
+import { catchError, exhaustMap, map, switchMap, tap } from "rxjs/operators";
 import * as fromApp from '../../store/app.reducer';
 import * as AccountsActions from '../../accounts/store/accounts.actions';
+import * as UserActions from '../../user/store/user.actions';
 import { AuthService } from "../auth.service";
 import * as AuthActions from './auth.actions';
 import * as ServerResponse from '../../shared/models/server-response.model';
@@ -14,6 +15,7 @@ import { Alert, AlertType } from "src/app/shared/models/alert.model";
 import getErrorMessage from '../../shared/error-message';
 import { of } from "rxjs";
 import { Router } from "@angular/router";
+import { getUser } from "./auth.selector";
 
 @Injectable()
 export class AuthEffects {
@@ -167,6 +169,33 @@ export class AuthEffects {
                 })
             )
         }) 
+    ))
+
+    updateUser$ = createEffect(() => this.actions$.pipe(
+        ofType(UserActions.updateUserSuccess),
+        concatLatestFrom(() => this.store.select(getUser)),
+        map(([action, user]) => {
+            const {  _id, email, name } = action.user;
+            if (user) {
+                const userObject = new User(_id, email, name, user.token, String(user.tokenExpires));
+                localStorage.setItem('user', JSON.stringify(userObject));
+                return AuthActions.setUpdatedUser({ user: userObject})
+            }
+            return { type: 'DUMMY' };
+        })
+    ))
+
+    updatePassword$ = createEffect(() => this.actions$.pipe(
+        ofType(UserActions.updatePasswordSuccess),
+        concatLatestFrom(() => this.store.select(getUser)),
+        map(([action, user]) => {
+            const { token, tokenExpires } = action.tokenData;
+            if (user) {
+                const userObject = new User(user._id, user.email, user.name, token, String(tokenExpires));
+                return this.handleAuth(userObject);
+            }
+            return { type: '' }
+        })
     ))
 
     constructor(

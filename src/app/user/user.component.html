@@ -1,29 +1,20 @@
 <div class="row justify-content-center align-items-center">
     <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-        <ng-container *ngIf="!serverError; else serverAlert">
             
-            <!-- SPINNER -->
-            <div class="spinner" *ngIf="isLoading">
-                <app-loading-spinner></app-loading-spinner>
-            </div>
-            <!-- ERROR -->
-            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" style="text-align: center;" role="alert">
-                {{ error }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <br>
-            </div>
-            <!-- SUCCESS -->
-            <div *ngIf="success" class="alert alert-success alert-dismissible fade show" style="text-align: center;" role="alert">
-                {{ success }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-    
+        <!-- ALERT -->
+        <div class="alert" *ngIf="alert"> 
+            <app-alert [alert]="alert" store="user"></app-alert>
+        </div>
+
+        <!-- SPINNER -->
+        <div class="spinner" *ngIf="isLoading">
+            <app-loading-spinner></app-loading-spinner>
+        </div>
+
+        <ng-container *ngIf="user && !isLoading">
+            
             <!-- USER INFO -->
-            <div class="user-info" *ngIf="user && viewMode">    
+            <div class="user-info" *ngIf="viewMode">    
                 <h4>
                     <div class="dropdown">
                         <div class="btn-group dropleft">
@@ -79,7 +70,7 @@
                 <table>
                     <tr>
                         <td>Total Accounts:</td>
-                        <td>{{ user.accounts.length }}</td>
+                        <td>{{ user.totalAccounts }}</td>
                     </tr>
                     <tr *ngIf="user.lastCheckedAccount">
                         <td>LastCheckedAccount:</td>
@@ -94,7 +85,7 @@
             </div>
     
             <!-- UPDATE PASSWORD MODE -->
-            <form class="password-form" *ngIf="updatePasswordMode && !isLoading" (ngSubmit)="onSubmitUpdatePassword()" [formGroup]="passwordForm">
+            <form class="password-form" *ngIf="updatePasswordMode" (ngSubmit)="onSubmitUpdatePassword()" [formGroup]="passwordForm">
                 <h4 style="text-align: center;">Update Password</h4>
                 <div class="form-group">
                     <label for="passwordCurrent">Current Password</label>
@@ -138,7 +129,7 @@
             </form>
     
             <!-- DEACTIVATE MODE -->
-            <form *ngIf="deactivateUserMode && !isLoading" class="deactivate-form">
+            <form *ngIf="deactivateUserMode" class="deactivate-form">
                 <h4 style="text-align: center;">Deactivate User</h4>
                 <form [formGroup]="deactivateForm" (ngSubmit)="onSubmitDeactivateUser()">
                     <div class="form-group">
@@ -151,7 +142,7 @@
             </form>
     
             <!-- DELETE MODE -->
-            <form *ngIf="deleteUserMode && !isLoading" class="delete-form">
+            <form *ngIf="deleteUserMode" class="delete-form">
                 <h4 style="text-align: center; color: red;">Delete User</h4>
                 <form [formGroup]="deleteForm" (ngSubmit)="onSubmitDeleteUser()">
                     <div class="form-group">
@@ -173,9 +164,9 @@
                         (click)="turnOnMode('viewMode')">Exit</button>
                 </form>
             </form>
-
+    
             <!-- RESET PIN MODE -->
-            <form *ngIf="resetPinMode && !isLoading" [formGroup]="pinForm" (ngSubmit)="onSubmitResetPin()">
+            <form *ngIf="resetPinMode" [formGroup]="pinForm" (ngSubmit)="onSubmitResetPin()">
                 <h4 style="text-align: center;">Reset PIN</h4>
                 <div class="form-group">
                     <label for="password">Your Password</label>
@@ -224,18 +215,5 @@
                 <button style="float: right;" class="btn btn-primary" type="button" (click)="turnOnMode('viewMode')">Exit</button>
             </form>
         </ng-container>
-
-        <ng-template #serverAlert>
-            <!-- SERVER ERROR -->
-            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" style="text-align: center;" role="alert">
-                {{ error }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <br>
-                <a class="clickable" (click)="fetchUserInfo()">Reload</a>
-            </div>
-        </ng-template>
-
     </div>
 </div>

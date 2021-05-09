@@ -45,7 +45,8 @@ export class AuthComponent implements OnInit, OnDestroy {
     
     this.route.params.subscribe(params => {
       this.isLoginMode = params['mode'] === 'login';
-      this.store.dispatch(AuthActions.clearAlert());
+      // little hack until i find elegant solution
+      if (this.storeSub) this.store.dispatch(AuthActions.clearAlert());
       if (this.isLoginMode) this.signupForm.reset();
       else this.loginForm.reset();
     });
@@ -84,6 +85,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   onChangeState(): void {
     this.router.navigate(['/', 'auth', (this.isLoginMode)?'signup':'login']);
+    this.store.dispatch(AuthActions.clearAlert());
   }
 
   onSubmit(): void {

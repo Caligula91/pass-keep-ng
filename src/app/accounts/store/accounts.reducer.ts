@@ -171,10 +171,24 @@ export const accountsReducer = createReducer(
         }
     }),
     
+    /**
+     * CLEAR
+     */
     on(AccountsActions.clearAlert, (state) => {
         return {
             ...state,
             alert: null,
+        }
+    }),
+    on(AccountsActions.clearAccounts, (state) => {
+        return {
+            ...state,
+            accounts: null,
+            isLoading: false,
+            alert: null,
+            focusedAccount: null,
+            fetchingPassword: false,
+            password: null,
         }
     })
 )

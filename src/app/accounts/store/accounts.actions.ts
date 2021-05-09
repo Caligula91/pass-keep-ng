@@ -96,8 +96,12 @@ export const deleteAccountFail = createAction(
 );
 
 /**
- * CLEAR ALERT
+ * CLEAR
  */
 export const clearAlert = createAction(
     '[Accounts] Clear Alert'
 );
+
+export const clearAccounts = createAction(
+    '[Accounts/Auth] Clear Accounts'
+)

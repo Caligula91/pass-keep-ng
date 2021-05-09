@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as AuthActions from '../../../auth/store/auth.actions';
 import * as AccountsActions from '../../../accounts/store/accounts.actions';
+import * as UserActions from '../../../user/store/user.actions';
 import * as fromApp from '../../../store/app.reducer';
 import { Alert, ActionType } from '../../models/alert.model';
 import { Router } from '@angular/router';
@@ -32,6 +33,7 @@ export class AlertComponent implements OnInit {
         break;
       }
       case 'user': {
+        this.store.dispatch(UserActions.clearAlert());
         break;
       }
       default: {
@@ -43,13 +45,12 @@ export class AlertComponent implements OnInit {
   onAction(action: ActionType): void {
     switch(action) {
       case ActionType.ResendEmailConfirm: {
-        console.log('send email again')
         // send email again
+        
         break;
       }
       case ActionType.FetchUser: {
-        console.log('send getMe http request again');
-        // send getMe http request again
+        this.store.dispatch(UserActions.fetchUser());
         break;
       }
       case ActionType.FetchAccounts: {

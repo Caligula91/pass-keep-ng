@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { catchError, map, mergeMap, switchMap } from "rxjs/operators";
 import * as AccountsActions from './accounts.actions';
+import * as AuthActions from '../../auth/store/auth.actions';
 import * as ServerResponse from '../../shared/models/server-response.model';
 import { environment } from "src/environments/environment";
 import { Alert, AlertType, ActionType } from "src/app/shared/models/alert.model";
@@ -16,8 +17,8 @@ export class AccountsEffects {
     fetchAccounts$ = createEffect(() => this.actions$.pipe(
         ofType(AccountsActions.fetchAccounts),
         switchMap(() => {
-            return this.http.get<ServerResponse.GetMe>(`${environment.API_HOST}users/me`).pipe(
-                map(res => res.user.accounts),
+            return this.http.get<ServerResponse.FetchAccounts>(`${environment.API_HOST}accounts`).pipe(
+                map(res => res.accounts),
                 map(accounts => this.castAccountsToArray(accounts)),
                 map(accounts => AccountsActions.setAccounts({ accounts })),
                 catchError(error => {
@@ -32,7 +33,7 @@ export class AccountsEffects {
         ofType(AccountsActions.addAccount),
         switchMap(action => {
             const { newAccount } = action;
-            const url = `${environment.API_HOST}users/account`;
+            const url = `${environment.API_HOST}accounts`;
             return this.http.put<ServerResponse.AddAccount>(url, newAccount).pipe(
                 map(res => res.accounts),
                 map(accounts => this.castAccountsToArray(accounts)),
@@ -52,7 +53,7 @@ export class AccountsEffects {
         ofType(AccountsActions.fetchPassword),
         mergeMap(action => {
             const { accountId, pin } = action;
-            const url = `${environment.API_HOST}users/account/${accountId}`;
+            const url = `${environment.API_HOST}accounts/${accountId}`;
             return this.http.post<ServerResponse.GetAccountPassword>(url, { pin }).pipe(
                 map(res => res.account.password),
                 map(password => AccountsActions.fetchPasswordSuccess({ password, accountId })),
@@ -73,7 +74,7 @@ export class AccountsEffects {
         ofType(AccountsActions.updateAccount),
         mergeMap(action => {
             const { accountId, updateFields } = action;
-            const url = `${environment.API_HOST}users/account/${accountId}`;
+            const url = `${environment.API_HOST}accounts/${accountId}`;
             return this.http.patch<ServerResponse.UpdateAccount>(url, updateFields).pipe(
                 map(res => this.castAccountsToArray(res.accounts)),
                 map(accounts => {
@@ -92,7 +93,7 @@ export class AccountsEffects {
         ofType(AccountsActions.deleteAccount),
         mergeMap(action => {
             const { accountId } = action;
-            const url = `${environment.API_HOST}users/account/${accountId}`;
+            const url = `${environment.API_HOST}accounts/${accountId}`;
             return this.http.delete<null>(url).pipe(
                 map(() => {
                     const alert = new Alert(AlertType.Success, 'Account deleted successfully.');
@@ -104,6 +105,11 @@ export class AccountsEffects {
                 })
             )
         })
+    ))
+
+    logout$ = createEffect(() => this.actions$.pipe(
+        ofType(AuthActions.logout),
+        map(() => AccountsActions.clearAccounts())
     ))
 
     constructor(

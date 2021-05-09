@@ -9,7 +9,7 @@ export enum ActionType {
     FetchAccounts = '[FETCH_ACCOUNTS] Reload',
     FetchUser = '[FETCH_USER] Reload',
     ResendEmailConfirm = '[RESEND_EMAIL_CONFIRM] Send Email Again',
-    ReturnToAccounts = '[ACCOUNTS] Navigate to Accounts'
+    ReturnToAccounts = '[ACCOUNTS] Navigate to Accounts',
 }
 
 export class Alert {

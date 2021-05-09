@@ -103,10 +103,11 @@ export const authReducer = createReducer(
             alert: null,
         }
     }),
-    on(AuthActions.logout, (state) => {
+    on(AuthActions.logout, (state, action) => {
         return {
             ...state,
             user: null,
+            alert: action.alert,
         }
     }),
     on(AuthActions.forgotPassword, (state) => {
@@ -135,6 +136,12 @@ export const authReducer = createReducer(
             ...state,
             isLoading: false,
             alert: action.alert,
+        }
+    }),
+    on(AuthActions.setUpdatedUser, (state, action) => {
+        return {
+            ...state,
+            user: action.user,
         }
     })
 )

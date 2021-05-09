@@ -7,6 +7,8 @@ import { User } from '../auth/user.model';
 import { Account } from '../shared/models/account.model';
 import { getUser } from '../auth/store/auth.selector';
 import { getAccounts } from '../accounts/store/accounts.selector';
+import { Alert, AlertType } from '../shared/models/alert.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -19,7 +21,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userStoreSub!: Subscription;
   user: User | null = null
 
-  constructor(private store: Store<fromApp.AppState>) { }
+  constructor(private store: Store<fromApp.AppState>, private router: Router) { }
 
   ngOnDestroy(): void {
     this.userStoreSub.unsubscribe();
@@ -34,7 +36,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.store.dispatch(AuthActions.logout());
+    const alert = new Alert(AlertType.Success, 'User Logged out successfully');
+    this.store.dispatch(AuthActions.logout({ alert }));
   }
 
 }

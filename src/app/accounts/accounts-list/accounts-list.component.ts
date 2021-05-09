@@ -6,7 +6,6 @@ import * as AccountsActions from '../store/accounts.actions';
 import { Account } from 'src/app/shared/models/account.model';
 import { AccountsService } from '../accounts.service';
 import { ClickTargets } from '../accounts-card/click-targets.model';
-import { DatabaseService } from 'src/app/shared/services/database.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PinEnterComponent } from 'src/app/shared/modals/pin-enter/pin-enter.component';
 import { getAccountsState } from '../store/accounts.selector';
@@ -31,7 +30,10 @@ export class AccountsListComponent implements OnInit, OnDestroy {
   order!: string;
   search!: string;
 
-  constructor(private accountsService: AccountsService, private databaseService: DatabaseService, private modalService: NgbModal, private store: Store<fromApp.AppState>) { }
+  constructor(
+    private accountsService: AccountsService, 
+    private modalService: NgbModal, 
+    private store: Store<fromApp.AppState>) { }
 
   ngOnDestroy(): void {
     this.storeSub.unsubscribe();

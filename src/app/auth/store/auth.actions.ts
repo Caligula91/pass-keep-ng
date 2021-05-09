@@ -53,7 +53,8 @@ export const autoLogin = createAction(
 );
 
 export const logout = createAction(
-    '[Auth] Logout'
+    '[Auth] Logout',
+    props<{ alert: Alert | null }>()
 );
 
 export const forgotPassword = createAction(
@@ -82,4 +83,9 @@ export const clearAlert = createAction(
 
 export const clearSignedupEmail = createAction(
     '[Auth] Clear SignedupEmail'
+);
+
+export const setUpdatedUser = createAction(
+    '[Auth/User] Set Updated User',
+    props<{ user: User }>()
 );
