@@ -28,8 +28,6 @@ import { PasswordResetComponent } from './auth/password-reset/password-reset.com
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { PasswordVisibilityDirective } from './shared/directives/password-visibility.directive';
 import { CardChoiceComponent } from './shared/modals/card-choice/card-choice.component';
-import { CheckmarkComponent } from './shared/components/checkmark/checkmark.component';
-import { SignedupComponent } from './auth/signedup/signedup.component';
 import { ForgotPasswordComponent } from './shared/modals/forgot-password/forgot-password.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { UserComponent } from './user/user.component';
@@ -47,6 +45,11 @@ import { AlertActionMessagePipe } from './shared/components/alert/alert-action-m
 import { AuthEffects } from './auth/store/auth.effects';
 import { AccountsEffects } from './accounts/store/accounts.effects';
 import { UserEffects } from './user/store/user.effects';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
+import { TimeAgoPipe } from './user/time-ago.pipe';
+import { DeleteDeviceComponent } from './shared/modals/delete-device/delete-device.component';
+import { LogoutConfirmComponent } from './shared/modals/logout-confirm/logout-confirm.component';
 
 @NgModule({
   declarations: [
@@ -71,8 +74,6 @@ import { UserEffects } from './user/store/user.effects';
     PasswordResetComponent,
     PasswordVisibilityDirective,
     CardChoiceComponent,
-    CheckmarkComponent,
-    SignedupComponent,
     ForgotPasswordComponent,
     UserComponent,
     UserOptionsComponent,
@@ -80,6 +81,11 @@ import { UserEffects } from './user/store/user.effects';
     LoadingDotsComponent,
     AlertComponent,
     AlertActionMessagePipe,
+    LoginComponent,
+    SignupComponent,
+    TimeAgoPipe,
+    DeleteDeviceComponent,
+    LogoutConfirmComponent,
   ],
   imports: [
     BrowserModule,

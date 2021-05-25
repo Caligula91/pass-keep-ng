@@ -1,0 +1,13 @@
+.warning {
+  color: red;
+}
+
+.forgot-password {
+  text-decoration: none;
+  float: right;
+  margin-top: 8px;
+}
+
+.auth-label {
+  text-align: center;
+}

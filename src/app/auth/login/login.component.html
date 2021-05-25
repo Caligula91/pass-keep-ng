@@ -1,0 +1,48 @@
+<!-- LOGIN FORM -->
+<form *ngIf="!guardMode; else guard" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <h4 class="auth-label">LOGIN</h4>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="text" name="email" class="form-control" formControlName="email">
+        <div class="warning" *ngIf="loginForm.get('email')?.touched">
+            <small *ngIf="loginForm.get('email')?.errors?.required">Email required</small>
+            <small *ngIf="loginForm.get('email')?.errors?.email">Invalid email format</small>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="passwo rd">Password</label>
+        <div class="input-group">
+            <input type="password" name="password" class="form-control" formControlName="password" #loginPass>
+            <div class="input-group-append">
+                <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="loginPass">
+            </div>
+        </div>
+        <small class="warning"
+            *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.required">Password
+            requried</small>
+    </div>
+    <button class="btn btn-success" type="submit" [disabled]="!loginForm.valid">Login</button>
+    <a class="clickable forgot-password" (click)="onForgotPassword()">Forgot Password?</a>
+</form>
+
+<!-- GUARD FORM -->
+<ng-template #guard>
+    <h4 class="auth-label">LOGIN</h4>
+    <form *ngIf="guardMode" [formGroup]="guardForm" (ngSubmit)="onSubmit()" style="margin-bottom: 50px;">
+        <div class="form-group">
+            <label for="guardCode">Enter guard code</label>
+            <input type="text" name="guardCode" class="form-control" formControlName="guardCode">
+        </div>
+        <button class="btn btn-success" [disabled]="!guardForm.valid">Login</button>
+    </form>
+    <button type="button" class="btn btn-dark" (click)="onBackToLogin()">Back to Login</button>
+</ng-template>
+
+<!-- SWITCH TO SIGNUP -->
+<div>
+    <hr>
+    <button type="button" class="btn btn-primary" (click)="onSwitchMode()">
+        Switch to Signup
+    </button>
+</div>
+

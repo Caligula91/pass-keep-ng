@@ -10,6 +10,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UserOptionsComponent } from '../shared/modals/user-options/user-options.component';
 import { getUserState } from './store/user.selector';
 import { Alert } from '../shared/models/alert.model';
+import { DeleteDeviceComponent } from '../shared/modals/delete-device/delete-device.component';
 
 @Component({
   selector: 'app-user',
@@ -20,6 +21,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
   userStoreSub!: Subscription;
   user: ServerResponse.User | null = null;
+  currentDevice: ServerResponse.Device | null = null;
   isLoading: boolean = false;
   alert: Alert | null = null;
   /**
@@ -111,6 +113,7 @@ export class UserComponent implements OnInit, OnDestroy {
     this.userStoreSub = this.store.select(getUserState).subscribe(data => {
       this.isLoading = data.isLoading;
       this.user = data.user;
+      this.currentDevice = data.currentDevice;
       this.alert = data.alert;
       this.nameForm.get('name')?.setValue(this.user?.name);
       if (this.alert?.type === 'SUCCESS') this.turnOnMode('viewMode');
@@ -175,6 +178,12 @@ export class UserComponent implements OnInit, OnDestroy {
 
   onSubmitResetPin(): void {
     this.store.dispatch(UserActions.resetPin({ pinData: this.pinForm.value }));
+  }
+
+  onRemoveDevice(deviceId: string): void {
+      this.modalService.open(DeleteDeviceComponent, {ariaLabelledBy: 'modal-basic-title', size: 'lg' }).result.then(result => {
+        this.store.dispatch(UserActions.deleteLoggedDevice({ deviceId }));
+      }, reason => {});
   }
 
 }

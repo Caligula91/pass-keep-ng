@@ -11,7 +11,7 @@ export const fetchUser = createAction(
 
 export const fetchUserSuccess = createAction(
     '[User] Fetch User Success',
-    props<{ user: ServerResponse.User }>()
+    props<{ user: ServerResponse.User, currentDevice: ServerResponse.Device }>()
 );
 
 export const fetchUserFail = createAction(
@@ -95,6 +95,24 @@ export const deleteUser = createAction(
 
 export const deleteUserFail = createAction(
     '[User] Delete User Fail',
+    props<{ alert: Alert }>()
+);
+
+/**
+ * DELETE LOGGED DEVICE
+ */
+export const deleteLoggedDevice = createAction(
+    '[User] Delete Logged Device',
+    props<{ deviceId: string }>()
+);
+
+export const deleteLoggedDeviceSuccess = createAction(
+    '[User] Delete Logged Device Success',
+    props<{ alert: Alert, user: ServerResponse.User, currentDevice: ServerResponse.Device}>()
+);
+
+export const deleteLoggedDeviceFail = createAction(
+    '[User] Delete Logged Device Fail',
     props<{ alert: Alert }>()
 );
 

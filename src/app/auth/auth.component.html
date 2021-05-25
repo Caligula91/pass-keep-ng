@@ -3,11 +3,6 @@
 
         <!-- ALERT -->
         <app-alert *ngIf="alert" [alert]="alert" store="auth"></app-alert>
-
-        <!-- LOGIN SUCCESS -->
-        <div *ngIf="loggedIn" style="text-align: center; margin-top: 50px;">
-            <app-checkmark></app-checkmark>
-        </div>
         
         <!-- LOADING SPINNER -->
         <div *ngIf="isLoading" class="spinner" style="margin-top: 100px;">
@@ -15,105 +10,11 @@
         </div>
         
         <!-- FORMS -->
-        <div class="form-container" *ngIf="!isLoading && !loggedIn">
+        <div class="form-container" *ngIf="!isLoading">
 
-            <!-- LOGIN FORM -->
-            <form *ngIf="isLoginMode" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-                <h4 class="auth-label">LOGIN</h4>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="text" name="email" class="form-control" formControlName="email">
-                    <div class="warning" *ngIf="loginForm.get('email')?.touched">
-                        <small *ngIf="loginForm.get('email')?.errors?.required">Email required</small>
-                        <small *ngIf="loginForm.get('email')?.errors?.email">Invalid email format</small>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-group">
-                        <input type="password" name="password" class="form-control" formControlName="password" #loginPass>
-                        <div class="input-group-append">
-                            <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="loginPass">
-                        </div>
-                    </div>
-                    <small class="warning"
-                        *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.required">Password
-                        requried</small>
-                </div>
-                <button class="btn btn-success" type="submit" [disabled]="!loginForm.valid">Login</button>
-                <a class="clickable forgot-password" (click)="onForgotPassword()">Forgot Password?</a>
-            </form>
-        
-            <!-- SIGNUP FORM -->
-            <form *ngIf="!isLoginMode" [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-                <h4 class="auth-label">SIGNUP</h4>
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" name="name" class="form-control" formControlName="name">
-                    <div class="warning" *ngIf="signupForm.get('name')?.touched">
-                        <div *ngIf="signupForm.get('name')?.errors; else invalidChar">
-                            <small *ngIf="signupForm.get('name')?.errors?.required">Name required</small>
-                            <small *ngIf="signupForm.get('name')?.errors?.minlength">Name must be at least 3 characters long</small>
-                            <small *ngIf="signupForm.get('name')?.errors?.maxlength">Name can't be longer than 30 characters</small>
-                        </div>
-                        <ng-template #invalidChar>
-                            <small *ngIf="signupForm.errors?.invalidCharacters">Name can contain only letters</small>
-                        </ng-template>
-                    </div>        
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="text" name="email" class="form-control" formControlName="email">
-                    <div class="warning" *ngIf="signupForm.get('email')?.touched">
-                        <small *ngIf="signupForm.get('email')?.errors?.required">Email required</small>
-                        <small *ngIf="signupForm.get('email')?.errors?.email">Invalid email format</small>
-                    </div>
-                </div>
-                <div formGroupName="passwordData">
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="input-group">
-                            <input type="password" name="password" class="form-control" formControlName="password" #inputPass>
-                            <div class="input-group-append">
-                                <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="inputPass">
-                            </div>
-                        </div>
-                        <div class="warning" *ngIf="signupForm.get('passwordData.password')?.touched">
-                            <small *ngIf="signupForm.get('passwordData.password')?.errors?.required">Password requried</small>
-                            <small *ngIf="signupForm.get('passwordData.password')?.errors?.minlength; else charValidation">
-                                Minimum length for is 8 characters
-                            </small>
-                            <ng-template #charValidation>
-                                <small *ngIf="signupForm.get('passwordData.password')?.errors?.invalidCharacters">Name can contain only letters and numbers</small>
-                            </ng-template>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="passwordConfirm">Password Confirm</label>
-                        <div class="input-group">
-                            <input type="password" name="passwordConfirm" class="form-control" formControlName="passwordConfirm" #inputPassConf>
-                            <div class="input-group-append">
-                                <img class="input-group-text clickable" alt="x" [appPasswordVisibility]="inputPassConf">
-                            </div>
-                        </div>
-                        <small class="warning" *ngIf="
-                                            !signupForm.valid &&
-                                            signupForm.get('passwordData')?.errors && 
-                                            signupForm.get('passwordData')?.errors?.passwordsNotMatching &&
-                                            signupForm.get('passwordData.password')?.touched &&
-                                            signupForm.get('passwordData.passwordConfirm')?.touched">Passwords not matching
-                        </small>
-                    </div>
-                </div>
-                <button class="btn btn-success" type="submit" [disabled]="!signupForm.valid">Signup</button>
-            </form>
+            <!-- LOGIN - SIGNUP -->
+            <router-outlet></router-outlet>
 
-            <!-- TOGGLE MODE -->
-            <div *ngIf="!isLoading">
-                <hr>
-                <button type="button" class="btn btn-primary" (click)="onChangeState()">Switch to {{
-                    isLoginMode?'Signup':'Login' }}</button>
-            </div>
         </div>
     </div>
 </div>

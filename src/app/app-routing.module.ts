@@ -7,13 +7,13 @@ import { AuthGuard } from './auth/auth.guard';
 import { EmailConfirmationDeleteComponent } from './auth/email-confirmation-delete/email-confirmation-delete.component';
 import { EmailConfirmationComponent } from './auth/email-confirmation/email-confirmation.component';
 import { PasswordResetComponent } from './auth/password-reset/password-reset.component';
-import { SignedupGuard } from './auth/signedup/signedup.guard';
-import { SignedupComponent } from './auth/signedup/signedup.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { HomeComponent } from './home/home.component';
 import { UserComponent } from './user/user.component';
 import { EmailConfirmationGuard } from './auth/email-confirmation/email-confirmation.guard';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -21,9 +21,12 @@ const routes: Routes = [
   { path: 'create-account', canActivate: [AuthGuard], component: CreateAccountComponent }, 
   { path: 'user',canActivate: [AuthGuard], component: UserComponent},
   
-  { path: 'auth', redirectTo: 'auth/login' },
-  { path: 'auth/:mode', canActivate: [AuthRouteGuard], component: AuthComponent },
-  { path: 'auth/signup/verification', canActivate: [SignedupGuard], component: SignedupComponent },
+  { path: 'auth', component: AuthComponent, canActivate: [AuthRouteGuard], children: [
+    { path: '', pathMatch: 'full', redirectTo: 'login'},
+    { path: 'login', component: LoginComponent },
+    { path: 'signup', component: SignupComponent },
+  ] },
+
   { path: 'email-confirmation/:emailToken', canActivate: [EmailConfirmationGuard], component: EmailConfirmationComponent },
   { path: 'email-confirmation/:emailToken/delete', component:  EmailConfirmationDeleteComponent},
   { path: 'reset-password/:passwordToken', component: PasswordResetComponent },

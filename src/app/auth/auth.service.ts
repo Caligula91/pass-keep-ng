@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import * as AuthActions from './store/auth.actions';
 import * as fromApp from '../store/app.reducer';
 import { Alert, AlertType } from '../shared/models/alert.model';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,8 @@ import { Alert, AlertType } from '../shared/models/alert.model';
 export class AuthService {
 
   private tokenExpTimer: any;
+  loginData$ = new BehaviorSubject<{ email: string, password: string } | null>(null);
+  signupData$ = new BehaviorSubject<{ name: string, email: string, password: string, passwordConfirm: string } | null>(null);
 
   constructor(private store: Store<fromApp.AppState>) { }
 
@@ -46,7 +49,7 @@ export class AuthService {
       }, 2147483647);
     } else {
       this.tokenExpTimer = setTimeout(() => {
-        const alert = new Alert(AlertType.Warning, 'Token expired. User logged out. Please login again');
+        const alert = new Alert(AlertType.Warning, 'Token expired. User logged out. Please login again.');
         this.store.dispatch(AuthActions.logout({ alert }));
       }, expDuration);
     }
@@ -57,6 +60,11 @@ export class AuthService {
       clearTimeout(this.tokenExpTimer);
       this.tokenExpTimer = null;   
     }
+  }
+
+  clearAuthData(): void {
+    this.loginData$.next(null);
+    this.signupData$.next(null);
   }
 
 }

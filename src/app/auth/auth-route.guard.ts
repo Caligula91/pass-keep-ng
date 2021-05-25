@@ -6,6 +6,9 @@ import { take, map } from 'rxjs/operators';
 import * as fromApp from '../store/app.reducer';
 import { getUser } from './store/auth.selector';
 
+/**
+ * ONLY NOT AUTHENTICATED USER CAN ACCESS THIS ROUTE
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +23,7 @@ export class AuthRouteGuard implements CanActivate {
       select(getUser),
       take(1),
       map(user => {
-        if (!user && (route.params['mode'] === 'login' || route.params['mode'] === 'signup')) return true;
+        if (!user) return true;
         return this.router.createUrlTree(['/']);
       })
     )

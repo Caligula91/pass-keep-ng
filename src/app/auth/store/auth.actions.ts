@@ -7,6 +7,11 @@ export const loginStart = createAction(
     props<{ loginData: { email: string, password: string } }>()
 );
 
+export const guardCodePending = createAction(
+    '[Auth] Guard Code Pending',
+    props<{ alert: Alert }>()
+);
+
 export const signupStart = createAction(
     '[Auth] Signup Start',
     props<{ signupData: { name: string, email: string, password: string, passwordConfirm: string } }>()
@@ -18,8 +23,7 @@ export const signupSuccess = createAction(
 );
 
 export const ResendEmailConfirm = createAction(
-    '[Auth] Resend Email Confirmation',
-    props<{ email: string }>()
+    '[Auth] Resend Email Confirmation'
 );
 
 export const ResendEmailConfirmResult = createAction(
@@ -77,6 +81,14 @@ export const resetPasswordResult = createAction(
     props<{ alert: Alert }>()
 );
 
+export const setUpdatedUser = createAction(
+    '[Auth/User] Set Updated User',
+    props<{ user: User }>()
+);
+
+/**
+ * CLEAR
+ */
 export const clearAlert = createAction(
     '[Auth] Clear Alert'
 );
@@ -85,7 +97,10 @@ export const clearSignedupEmail = createAction(
     '[Auth] Clear SignedupEmail'
 );
 
-export const setUpdatedUser = createAction(
-    '[Auth/User] Set Updated User',
-    props<{ user: User }>()
+export const clearGuard = createAction(
+    '[Auth] Clear Guard Data',
+);
+
+export const clearState = createAction(
+    '[Auth] Clear State',
 );

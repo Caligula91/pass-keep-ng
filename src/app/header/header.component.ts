@@ -8,7 +8,8 @@ import { Account } from '../shared/models/account.model';
 import { getUser } from '../auth/store/auth.selector';
 import { getAccounts } from '../accounts/store/accounts.selector';
 import { Alert, AlertType } from '../shared/models/alert.model';
-import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { LogoutConfirmComponent } from '../shared/modals/logout-confirm/logout-confirm.component';
 
 @Component({
   selector: 'app-header',
@@ -21,7 +22,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userStoreSub!: Subscription;
   user: User | null = null
 
-  constructor(private store: Store<fromApp.AppState>, private router: Router) { }
+  constructor(private store: Store<fromApp.AppState>, private modalService: NgbModal) { }
 
   ngOnDestroy(): void {
     this.userStoreSub.unsubscribe();
@@ -36,8 +37,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    const alert = new Alert(AlertType.Success, 'User Logged out successfully');
-    this.store.dispatch(AuthActions.logout({ alert }));
+    this.modalService.open(LogoutConfirmComponent, {ariaLabelledBy: 'modal-basic-title', size: 'sm' }).result.then(result => {
+      const alert = new Alert(AlertType.Success, 'User logged out successfully.');
+      this.store.dispatch(AuthActions.logout({ alert }));
+    }, reason => {})
   }
 
 }

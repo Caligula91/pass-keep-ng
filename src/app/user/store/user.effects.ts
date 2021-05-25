@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Actions, createEffect, ofType } from "@ngrx/effects";
+import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
+import { Store } from "@ngrx/store";
+import * as fromApp from '../../store/app.reducer';
 import * as UserActions from './user.actions';
 import * as AuthActions from '../../auth/store/auth.actions';
 import { catchError, exhaustMap, map } from "rxjs/operators";
@@ -9,6 +11,7 @@ import { Alert, AlertType, ActionType } from "src/app/shared/models/alert.model"
 import { of } from "rxjs";
 import { environment } from "src/environments/environment";
 import * as ServerResponse from '../../shared/models/server-response.model';
+import { getUserState } from "./user.selector";
 
 @Injectable()
 export class UserEffects {
@@ -18,14 +21,16 @@ export class UserEffects {
         exhaustMap(() => {
             const url = `${environment.API_HOST}users/me`;
             return this.http.get<ServerResponse.GetMe>(url).pipe(
-                map(res => res.user),
-                map(user => {
+                map(res => {
                     return {
-                        ...user,
-                        accounts: undefined,
+                        currentDevice: res.currentDevice,
+                        user: {
+                            ...res.user,
+                            accounts: undefined,
+                        }
                     }
                 }),
-                map(user => UserActions.fetchUserSuccess({ user })),
+                map(data => UserActions.fetchUserSuccess({ user: data.user, currentDevice: data.currentDevice })),
                 catchError(error => {
                     const alert = new Alert(AlertType.Error, getErrorMessage(error), { dismissible: false, action: ActionType.FetchUser });
                     return of(UserActions.fetchUserFail({ alert }))
@@ -42,7 +47,7 @@ export class UserEffects {
             return this.http.patch<ServerResponse.UpdateUser>(url, updateData).pipe(
                 map(res => res.user),
                 map(user => {
-                    const alert = new Alert(AlertType.Success, 'User updated successfully');
+                    const alert = new Alert(AlertType.Success, 'User updated successfully.');
                     return UserActions.updateUserSuccess({ alert, user });
                 }),
                 catchError(error => {
@@ -66,7 +71,7 @@ export class UserEffects {
                     }
                 }),
                 map(tokenData => {
-                    const alert = new Alert(AlertType.Success, 'Password updated successfully');
+                    const alert = new Alert(AlertType.Success, 'Password updated successfully.');
                     return UserActions.updatePasswordSuccess({ alert, tokenData });
                 }),
                 catchError(error => {
@@ -130,6 +135,39 @@ export class UserEffects {
         })
     ))
 
+    deleteLoggedDevice$ = createEffect(() => this.actions$.pipe(
+        ofType(UserActions.deleteLoggedDevice),
+        concatLatestFrom(() => this.store.select(getUserState)),
+        exhaustMap(([action, userState]) => {
+            const { deviceId } = action;
+            const url = `${environment.API_HOST}users/me/remove-device/${deviceId}`; 
+            return this.http.patch<ServerResponse.deleteLoggedDevice>(url, {}).pipe(
+                map(res => {
+                    return {
+                        ...res,
+                        user: {
+                            ...res.user,
+                            accounts: undefined,
+                        }
+                    }
+                }),
+                map(res => {
+                    if (userState.currentDevice?._id === action.deviceId ) {
+                        const alert = new Alert(AlertType.Success, res.message + ' You have been logged out.');
+                        return AuthActions.logout({ alert });
+                    } else {
+                        const alert = new Alert(AlertType.Success, res.message);
+                        return UserActions.deleteLoggedDeviceSuccess({ alert, user: res.user, currentDevice: res.currentDevice });
+                    }
+                }),
+                catchError(error => {
+                    const alert = new Alert(AlertType.Error, getErrorMessage(error));
+                    return of(UserActions.deleteLoggedDeviceFail({ alert }));
+                })
+            )
+        })
+    ))
+
     logout$ = createEffect(() => this.actions$.pipe(
         ofType(AuthActions.logout),
         map(() => UserActions.clearUser())
@@ -137,7 +175,8 @@ export class UserEffects {
     
     constructor(
         private actions$: Actions,
-        private http: HttpClient
+        private http: HttpClient,
+        private store: Store<fromApp.AppState>
     ) {}
 
 }

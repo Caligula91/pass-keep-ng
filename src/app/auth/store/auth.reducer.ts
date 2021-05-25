@@ -11,6 +11,7 @@ export interface AuthState {
     isLoading: boolean,
     alert: Alert | null,
     signedupEmail: string | null,
+    guardMode: boolean,
 }
 
 /**
@@ -21,6 +22,7 @@ export const initState: AuthState = {
     isLoading: false,
     alert: null,
     signedupEmail: null,
+    guardMode: false,
 }
 
 export const authReducer = createReducer(
@@ -32,6 +34,14 @@ export const authReducer = createReducer(
             alert: null,
         }
     }),
+    on(AuthActions.guardCodePending, (state, action) => {
+        return {
+            ...state,
+            isLoading: false,
+            alert: action.alert,
+            guardMode: true,
+        }
+    }),
     on(AuthActions.authSuccess, (state, action) => {
         return {
             ...state,
@@ -39,6 +49,7 @@ export const authReducer = createReducer(
             user: action.user,
             alert: action.alert,
             signedupEmail: null,
+            guardMode: false,
         }
     }),
     on(AuthActions.authFail, (state, action) => {
@@ -60,6 +71,7 @@ export const authReducer = createReducer(
             ...state,
             isLoading: false,
             signedupEmail: action.email,
+            alert: action.alert,
         }
     }),
     on(AuthActions.clearSignedupEmail, (state) => {
@@ -142,6 +154,22 @@ export const authReducer = createReducer(
         return {
             ...state,
             user: action.user,
+        }
+    }),
+    on(AuthActions.clearState, (state) => {
+        return {
+            ...state,
+            isLoading: false,
+            alert: null,
+            guardMode: false,
+            signedupEmail: null,
+        }
+    }),
+    on(AuthActions.clearGuard, (state) => {
+        return {
+            ...state,
+            alert: null,
+            guardMode: false,
         }
     })
 )

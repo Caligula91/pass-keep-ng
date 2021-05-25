@@ -1,3 +1,14 @@
+export interface Device {
+    _id: string,
+    deviceId: string,
+    ip: string,
+    location: string,
+    os: string,
+    platform: string,
+    browser: string,
+    lastActivity: string, 
+}
+
 export interface User {
     _id: string,
     name: string,
@@ -7,6 +18,7 @@ export interface User {
     lastCheckedAccount?: string,
     lastCheckedAccountDate?: string,
     totalAccounts?: number,
+    loggedDevices?: Array<Device>
 }
 
 export interface Accounts extends Array<{
@@ -20,6 +32,7 @@ export interface Accounts extends Array<{
 export interface GetMe {
     status: string,
     user: User,
+    currentDevice: Device
 }
 
 export interface FetchAccounts {
@@ -59,6 +72,7 @@ export interface Login {
     token: string,
     tokenExpires: string,
     user: User,
+    message?: string,
 }
 
 export interface Signup {
@@ -113,6 +127,13 @@ export interface DeactivateUser {
 export interface DeleteUser {
     status: string,
     message: string,
+}
+
+export interface deleteLoggedDevice {
+    status: string,
+    message: string,
+    user: User,
+    currentDevice: Device,
 }
 
 export interface ResetPin {

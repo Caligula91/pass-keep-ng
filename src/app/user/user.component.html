@@ -14,7 +14,8 @@
         <ng-container *ngIf="user && !isLoading">
             
             <!-- USER INFO -->
-            <div class="user-info" *ngIf="viewMode">    
+            <div class="user-info" *ngIf="viewMode">
+                <!-- USER -->
                 <h4>
                     <div class="dropdown">
                         <div class="btn-group dropleft">
@@ -34,7 +35,7 @@
                     <img class="menu-image-mobile clickable" (click)="onOpenMenuMobile()" src="/assets/menu.png" alt="...">
                     User Info
                 </h4>
-                <table>
+                <table class="user-table">
                     <tr>
                         <td [ngClass]="{ 'name-edit-mode': editName }">Name:</td>
                         <td *ngIf="!editName; else editNameForm">{{ user.name }}</td>
@@ -66,8 +67,9 @@
                     </tr>
                 </table>
                 <hr>
+                <!-- ACCOUNTS -->
                 <h4>Accounts Info</h4>
-                <table>
+                <table class="accounts-table">
                     <tr>
                         <td>Total Accounts:</td>
                         <td>{{ user.totalAccounts }}</td>
@@ -82,6 +84,26 @@
                     </tr>
                 </table>
                 <hr>
+                <!-- LOGGED DEVICES -->
+                <h4>Where You're Logged In</h4>
+                <table class="table table-sm devices-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Platform</th>
+                            <th scope="col">Location</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let device of user.loggedDevices">
+                            <td [ngClass]="{ 'current-device': currentDevice?._id === device._id }">{{ device.platform }} ({{ device.browser }})</td>
+                            <td [ngClass]="{ 'current-device': currentDevice?._id === device._id }">{{ device.location }} - {{ device.lastActivity | timeAgo }}</td>
+                            <td>
+                                <button class="device-remove" (click)="onRemoveDevice(device._id)"><img src="/assets/remove.png" alt="remove"></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
     
             <!-- UPDATE PASSWORD MODE -->

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Actions, concatLatestFrom, createEffect, ofType } from "@ngrx/effects";
-import { catchError, exhaustMap, map, switchMap, tap } from "rxjs/operators";
+import { catchError, map, switchMap, tap } from "rxjs/operators";
 import * as fromApp from '../../store/app.reducer';
 import * as AccountsActions from '../../accounts/store/accounts.actions';
 import * as UserActions from '../../user/store/user.actions';
@@ -11,11 +11,11 @@ import * as AuthActions from './auth.actions';
 import * as ServerResponse from '../../shared/models/server-response.model';
 import { environment } from "src/environments/environment";
 import { User } from "../user.model";
-import { Alert, AlertType } from "src/app/shared/models/alert.model";
+import { Alert, AlertType, ActionType } from "src/app/shared/models/alert.model";
 import getErrorMessage from '../../shared/error-message';
-import { of } from "rxjs";
+import { of, throwError } from "rxjs";
 import { Router } from "@angular/router";
-import { getUser } from "./auth.selector";
+import { getAuthState, getUser } from "./auth.selector";
 
 @Injectable()
 export class AuthEffects {
@@ -27,7 +27,7 @@ export class AuthEffects {
             return  this.http.post<ServerResponse.Signup>(url, action.signupData).pipe(
                 tap(() => this.authService.addStorageListener()),
                 map(res => {
-                    const alert = new Alert(AlertType.Primary, res.message);
+                    const alert = new Alert(AlertType.Primary, res.message, { dismissible: false, action: ActionType.ResendEmailConfirm });
                     return AuthActions.signupSuccess({ alert, email: action.signupData.email });
                 }),
                 catchError(error => {
@@ -40,15 +40,17 @@ export class AuthEffects {
 
     resendEmailConfirm$ = createEffect(() => this.actions$.pipe(
         ofType(AuthActions.ResendEmailConfirm),
-        switchMap(action => {
+        concatLatestFrom(() => this.store.select(getAuthState)),
+        switchMap(([action, authState]) => {
             const url = `${environment.API_HOST}users/resend-email-confirm`;
-            return this.http.post<ServerResponse.ReSendEmail>(url, { email: action.email }).pipe(
+            if (!authState.signedupEmail) return of(AuthActions.ResendEmailConfirmResult({ alert: new Alert(AlertType.Error, 'unknown error') }));
+            return this.http.post<ServerResponse.ReSendEmail>(url, { email: authState.signedupEmail }).pipe(
                 map(res => {
-                    const alert = new Alert(AlertType.Primary, res.message);
+                    const alert = new Alert(AlertType.Primary, res.message, { dismissible: false, action: ActionType.ResendEmailConfirm });
                     return AuthActions.ResendEmailConfirmResult({ alert });
                 }),
                 catchError(error => {
-                    const alert = new Alert(AlertType.Error, getErrorMessage(error));
+                    const alert = new Alert(AlertType.Warning, getErrorMessage(error), { dismissible: false, action: ActionType.ResendEmailConfirm });
                     return of(AuthActions.ResendEmailConfirmResult({ alert }));
                 })
             )
@@ -82,13 +84,19 @@ export class AuthEffects {
         ofType(AuthActions.loginStart),
         switchMap(action => {
             const url = `${environment.API_HOST}users/login`
-            return this.http.post<ServerResponse.Login>(url, action.loginData).pipe(
+            return this.http.post<ServerResponse.Login>(url, action.loginData, {observe : 'response'} ).pipe(
                 map(res => {
+                    if (!res || !res.body) throw throwError({ message: 'No response' });
+                    return { res: res.body, statusCode: res.status };
+                }), 
+                map(resObject => {
+                    const { res, statusCode } = resObject
+                    if (statusCode === 202) {
+                        const alert = new Alert(AlertType.Warning, res.message || 'Guard code required to login. We sent you an email, check your inbox.', { dismissible: false })
+                        return AuthActions.guardCodePending({ alert });
+                    }
                     const { token, tokenExpires, user: { _id, name, email } } = res;
-                    return new User(_id, email, name, token, tokenExpires);
-                }),
-                map(user => {
-                    return this.handleAuth(user, { redirect: true });
+                    return this.handleAuth(new User(_id, email, name, token, tokenExpires), { redirect: true });;
                 }),
                 catchError(error => {
                     const alert = new Alert(AlertType.Error, getErrorMessage(error));

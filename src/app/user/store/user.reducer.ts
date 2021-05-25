@@ -5,12 +5,14 @@ import * as ServerResponse from '../../shared/models/server-response.model';
 
 export interface UserState {
     user: ServerResponse.User | null,
+    currentDevice: ServerResponse.Device | null,
     isLoading: boolean,
     alert: Alert | null,
 }
 
 export const initState: UserState = {
     user: null,
+    currentDevice: null,
     isLoading: false,
     alert: null,
 }
@@ -33,6 +35,7 @@ export const userReducer = createReducer(
             ...state,
             isLoading: false,
             user: action.user,
+            currentDevice: action.currentDevice,
             alert: null,
         }
     }),
@@ -40,6 +43,7 @@ export const userReducer = createReducer(
         return {
             ...state,
             isLoading: false,
+            currentDevice: null,
             user: null,
             alert: action.alert,
         }
@@ -158,6 +162,33 @@ export const userReducer = createReducer(
     }),
 
     /**
+     * DELETE LOGGED DEVICE
+     */
+    on(UserActions.deleteLoggedDevice, (state) => {
+        return {
+            ...state,
+            isLoading: true,
+            alert: null,
+        }
+    }),
+    on(UserActions.deleteLoggedDeviceSuccess, (state, action) => {
+        return {
+            ...state,
+            isLoading: false,
+            user: action.user,
+            currentDevice: action.currentDevice,
+            alert: action.alert,
+        }
+    }),
+    on(UserActions.deleteLoggedDeviceFail, (state, action) => {
+        return {
+            ...state,
+            isLoading: false,
+            alert: action.alert,
+        }
+    }),
+
+    /**
      * CLEAR
      */
     on(UserActions.clearAlert, (state) => {
@@ -170,6 +201,7 @@ export const userReducer = createReducer(
         return {
             ...state,
             user: null,
+            currentDevice: null,
             isLoading: false,
             alert: null,
         }

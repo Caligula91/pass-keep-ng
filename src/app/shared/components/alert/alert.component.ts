@@ -45,8 +45,7 @@ export class AlertComponent implements OnInit {
   onAction(action: ActionType): void {
     switch(action) {
       case ActionType.ResendEmailConfirm: {
-        // send email again
-        
+        this.store.dispatch(AuthActions.ResendEmailConfirm()); 
         break;
       }
       case ActionType.FetchUser: {

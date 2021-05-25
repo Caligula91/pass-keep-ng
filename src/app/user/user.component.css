@@ -1,9 +1,19 @@
-table td {
+.user-table td {
+  padding: 10px 10px;
+}
+.accounts-table td {
   padding: 10px 10px;
 }
 
-table tr td:nth-child(2) {
+.user-table tr td:nth-child(2) {
   text-align: center;
+}
+.accounts-table tr td:nth-child(2) {
+  text-align: center;
+}
+
+.current-device {
+  color: green;
 }
 
 h4 {
@@ -12,7 +22,8 @@ h4 {
   margin-top: 60px;
 }
 
-table {
+.user-table,
+.accounts-table {
   margin: 0 auto;
 }
 
@@ -89,4 +100,19 @@ table .name-edit-mode {
 
 .warning {
   color: red;
+}
+
+.device-remove {
+  border: none;
+  background-color: transparent;
+  padding: 0 0;
+}
+
+.device-remove img {
+  height: 18px;
+  width: 18px;
+}
+
+.device-remove img:active {
+  transform: scale(0.9);
 }
