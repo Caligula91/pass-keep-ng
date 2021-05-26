@@ -38,6 +38,9 @@ export class CreateAccountComponent implements OnInit, OnDestroy {
     this.storeSub = this.store.select(getAccountsState).subscribe(data => {
       this.isLoading = data.isLoading;
       this.alert = data.alert;
+      if (this.alert?.type === 'SUCCESS') {
+        this.resetForm();
+      }
     });
     
     this.createForm = new FormGroup({
