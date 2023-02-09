@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/pass-keep",
+    "public": "dist/pass-keep-ng",
     "ignore": [
       "firebase.json",
       "**/.*",
